@@ -1,0 +1,50 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "start": "nest start --watch",
+    "build": "nest build"
+  },
+  "keywords": [
+    "domino",
+    "game"
+  ],
+  "author": "Andrew1407, dgomilko",
+  "license": "MIT",
+  "dependencies": {
+    "@nestjs/common": "^8.2.3",
+    "@nestjs/config": "^1.1.5",
+    "@nestjs/core": "^8.2.3",
+    "@nestjs/platform-fastify": "^8.2.3",
+    "@nestjs/platform-ws": "^8.2.3",
+    "@nestjs/websockets": "^8.2.3"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^8.2.3",
+    "@types/jest": "^27.0.3",
+    "@types/node": "^16.11.12",
+    "@types/ws": "^8.2.2",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.1"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
