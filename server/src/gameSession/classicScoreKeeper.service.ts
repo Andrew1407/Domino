@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DominoTile, TilesDeck } from './entities/DominoTile';
+import DominoTile, { TilesDeck } from './entities/DominoTile';
 import { PlayerName } from './entities/Player';
 import { PlayersDecks } from './playMode/PlayMode';
 import ScoreKeeper, { PlayersScore } from './playMode/ScoreKeeper';
@@ -14,7 +14,7 @@ export default class ClassicScoreKeeper implements ScoreKeeper {
     const roundScore: PlayersScore = this.countRoundScore(playersDecks);
     type PlayerStats = [string, number];
     const winnerReducer = (cur: PlayerStats, next: PlayerStats): PlayerStats => (
-      next[1] > cur[1] ? next : cur
+      next[1] < cur[1] ? next : cur
     );
     const scoreEntries: PlayerStats[] = Object.entries(roundScore);
     const [ winner, minScore ]: PlayerStats = scoreEntries.reduce(winnerReducer);
@@ -31,7 +31,7 @@ export default class ClassicScoreKeeper implements ScoreKeeper {
     return newScore;
   }
 
-  checkWinner(
+  public checkWinner(
     playersScore: PlayersScore,
     finalScore: number
   ): PlayerName | null {
@@ -43,7 +43,7 @@ export default class ClassicScoreKeeper implements ScoreKeeper {
   }
 
   private countRoundScore(playersDecks: PlayersDecks): PlayersScore {
-    const countScore = (sum: number, [l, r]: DominoTile): number => sum + l + r;
+    const countScore = (sum: number, t: DominoTile): number => sum + t.tileSum();
     const scoreReducer = (
       acc: PlayersScore,
       [player, deck]: [PlayerName, TilesDeck]
@@ -51,7 +51,6 @@ export default class ClassicScoreKeeper implements ScoreKeeper {
       ...acc,
       [player]: deck.reduce(countScore, 0),
     });
-
     return Object.entries(playersDecks).reduce(scoreReducer, {});
   }
 }

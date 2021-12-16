@@ -1,28 +1,29 @@
-export type TileValue = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-export type DominoTile = [TileValue, TileValue];
+export type EndValue = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type TilesDeck = DominoTile[];
-// export type TileEnd = { value: TileValue, free: boolean };
 
-// export default class DominoTile {
-//   private readonly firstEnd: TileEnd;
-//   private readonly secondEnd: TileEnd;
-
-//   constructor(firstEnd: TileValue, secondEnd: TileValue) {
-//     const free: boolean = true;
-//     this.firstEnd = { value: firstEnd, free };
-//     this.secondEnd = { value: secondEnd, free };
-//   }
+export default class DominoTile {
+  public static of(left: EndValue, right: EndValue): DominoTile {
+    return new DominoTile(left, right);
+  }
   
-//   get isDouble(): boolean {
-//     return this.firstEnd.value === this.secondEnd.value;
-//   }
+  constructor(
+    public readonly left: EndValue,
+    public readonly right: EndValue
+  ) {}
 
-//   get ends(): [TileEnd, TileEnd] {
-//     return [
-//       { ...this.firstEnd },
-//       { ...this.secondEnd }
-//     ];
-//   }
+  public isDouble(): boolean {
+    return this.left === this.right;
+  }
 
-//   public occupy()
-// }
+  public tileSum(): number {
+    return this.left + this.right;
+  }
+
+  public copy(): DominoTile {
+    return new DominoTile(this.left, this.right);
+  }
+
+  public copyReversed(): DominoTile {
+    return new DominoTile(this.right, this.left);
+  }
+}

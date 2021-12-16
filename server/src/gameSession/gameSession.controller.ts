@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Req } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
 import GameSessionGateway from './gameSession.gateway';
 
 @Controller('domino-session')
