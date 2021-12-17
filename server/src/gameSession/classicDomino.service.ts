@@ -20,7 +20,8 @@ export default class ClassicDomino implements PlayMode {
     players: PlayerName[],
     deck: TilesDeck
   ): [PlayersDecks, TilesDeck] {
-    const tilesLeft: TilesDeck = [ ...deck ];
+    const tilesLeft: TilesDeck = deck
+      .map((t: DominoTile): DominoTile => t.copy());
     const playersDecks: PlayersDecks = {};
     const usersCount: number = players.length;
     const userDeckSize: number = usersCount > 2 ? 5 : 7;
@@ -39,7 +40,7 @@ export default class ClassicDomino implements PlayMode {
       acc: PlayersDecks,
       [key, el]: [string, TilesDeck]
     ): PlayersDecks => ({
-      ...acc, [key]: [ ...el ]
+      ...acc, [key]: el.map((t: DominoTile): DominoTile => t.copy())
     });
     const leftDeck: PlayersDecks = Object.entries(playersDecks).reduce(copyReducer, {});
     type searchValues = { name?: PlayerName, value?: DominoTile };
@@ -54,23 +55,25 @@ export default class ClassicDomino implements PlayMode {
       obj.name = player as PlayerName;
     };
     
-    for (const player in playersDecks)
-      for (const tile of playersDecks[player]) {
-        if (tile.isDouble())
+    for (const player in leftDeck)
+      for (const tile of leftDeck[player]) {
+        if (tile.isDouble()) {
           if (!maxDouble.value)
             setSearchValues(maxDouble, tile, player as PlayerName);
-          else if (maxDouble.value < tile[0])
+          else if (maxDouble.value.left < tile.left)
             setSearchValues(maxDouble, tile, player as PlayerName);
-        else
+        } else {
           if (!maxTileSum.value)
             setSearchValues(maxTileSum, tile, player as PlayerName);
           else if (maxTileSum.value.tileSum() < tile.tileSum())
             setSearchValues(maxTileSum, tile, player as PlayerName);
+        }
       }
 
     const foundTile: DominoTile = maxDouble.value ?? maxTileSum.value;
     const foundPlayer: PlayerName = maxDouble.name ?? maxTileSum.name;
-    leftDeck[foundPlayer] = leftDeck[foundPlayer].filter((t: DominoTile): boolean => t === foundTile);
+    leftDeck[foundPlayer] = leftDeck[foundPlayer]
+      .filter((t: DominoTile): boolean => t !== foundTile);
     return [foundPlayer, foundTile, leftDeck];
   }
 

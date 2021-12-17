@@ -1,6 +1,7 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
 import * as dotenv from 'dotenv';
+import RedisService from 'src/redis/redis.service';
 
 dotenv.config();
 
@@ -12,6 +13,8 @@ export default class GameSessionGateway {
   @WebSocketServer() private readonly wss: Server;
   private sss: { [key: string]: WebSocket[] } = {};
 
+  constructor(private readonly db: RedisService) {}
+
   @SubscribeMessage('test-data')
   public async onTestData(@ConnectedSocket() client: WebSocket, @MessageBody() data: string) {
     this.sss[data] ??= [];
@@ -20,8 +23,6 @@ export default class GameSessionGateway {
   }
 
   public sendMessage(message: string) {
-    // for (const key in this.sss)
-    //   if (this.sss[key])
     this.sss[message]?.forEach(c => c.send(message));
   }
 }
