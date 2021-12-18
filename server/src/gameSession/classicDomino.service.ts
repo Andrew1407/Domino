@@ -90,10 +90,10 @@ export default class ClassicDomino implements PlayMode {
   public ableToPlay(
     currentPlayer: PlayerName,
     playersDecks: PlayersDecks,
-    stock: TilesDeck,
+    stockSize: number,
     ends: TilesDeck
   ): MoveState {
-    if (stock.length) return MoveState.AVAILABLE;
+    if (stockSize) return MoveState.AVAILABLE;
     const currentPlayerDeck: TilesDeck = playersDecks[currentPlayer];
     const ableForCurrentPlayer: boolean = this.availabeToMove(currentPlayerDeck, ends);
     if (ableForCurrentPlayer) return MoveState.AVAILABLE;

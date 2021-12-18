@@ -1,7 +1,7 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
 import * as dotenv from 'dotenv';
-import RedisService from 'src/redis/redis.service';
+import RedisService from 'src/gameSession/storage/redis.service';
 
 dotenv.config();
 

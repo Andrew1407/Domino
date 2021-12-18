@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { REDIS_CLIENT } from './redis.options';
-import RedisService from './redis.service';
+import { REDIS_CLIENT } from './storage.options';
+import StorageService from './storage.service';
 
 type RedisOptions = {
   useFactory: (...args: unknown[]) => unknown;
@@ -8,29 +8,29 @@ type RedisOptions = {
 };
 
 @Module({})
-export default class RedisModule {
+export default class StorageModule {
   public static register(options?: RedisOptions): DynamicModule {
     return {
-      module: RedisModule,
+      module: StorageModule,
       providers: [
         Object.assign({ provide: REDIS_CLIENT }, options ? {
           inject: options.inject,
           useFactory: async (...args: unknown[]) => {
             const clientOptions = options.useFactory(...args);
-            const client = RedisService.client(clientOptions);
+            const client = StorageService.client(clientOptions);
             await client.connect();
             return client;
           }
         } : {
-          useValue: RedisService.client(),
+          useValue: StorageService.client(),
         }),
-        RedisService,
+        StorageService,
       ],
-      exports: [RedisService],
+      exports: [StorageService],
     };
   }
 
   public static forRoot(options?: RedisOptions): DynamicModule {
-    return { ...RedisModule.register(options), global: true };
+    return { ...StorageModule.register(options), global: true };
   } 
 }

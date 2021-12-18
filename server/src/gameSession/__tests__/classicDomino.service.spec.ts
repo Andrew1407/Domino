@@ -28,7 +28,7 @@ type testDataAbleToPlay = {
   playersNumber?: number,
   currentPlayer: PlayerName,
   playerDecks: PlayersDecks,
-  stock: TilesDeck,
+  stockSize: number,
   ends: TilesDeck,
   expected?: MoveState,
 }
@@ -560,13 +560,13 @@ describe('classic (traditional) domino class', (): void => {
             Ruzur: [DominoTile.of(0, 1), DominoTile.of(3, 4)],
             Sasik: [DominoTile.of(3, 2), DominoTile.of(6, 6)]
           },
-          stock: [DominoTile.of(4, 4), DominoTile.of(0, 0)],
+          stockSize: 2,
           ends: [DominoTile.of(2, 1), DominoTile.of(4, 5)],
         }
         const result: MoveState = rulesHandler.ableToPlay(
           testData.currentPlayer,
           testData.playerDecks,
-          testData.stock,
+          testData.stockSize,
           testData.ends
         )
         expect(result).toEqual(MoveState.AVAILABLE);
@@ -580,13 +580,13 @@ describe('classic (traditional) domino class', (): void => {
           Ruzur: [DominoTile.of(0, 1), DominoTile.of(3, 5)],
           Sasik: [DominoTile.of(3, 2), DominoTile.of(6, 6)]
         },
-        stock: [],
+        stockSize: 0,
         ends: [DominoTile.of(2, 1), DominoTile.of(4, 5)],
       }
       const result: MoveState = rulesHandler.ableToPlay(
         testData.currentPlayer,
         testData.playerDecks,
-        testData.stock,
+        testData.stockSize,
         testData.ends
       )
       expect(result).toEqual(MoveState.AVAILABLE);
@@ -602,13 +602,13 @@ describe('classic (traditional) domino class', (): void => {
             Sasik: [DominoTile.of(3, 2), DominoTile.of(6, 6)],
             Bobo: [DominoTile.of(3, 1), DominoTile.of(1, 1)],
           },
-          stock: [],
+          stockSize: 0,
           ends: [DominoTile.of(2, 1), DominoTile.of(4, 5)],
         }
         const result: MoveState = rulesHandler.ableToPlay(
           testData.currentPlayer,
           testData.playerDecks,
-          testData.stock,
+          testData.stockSize,
           testData.ends
         )
         expect(result).toEqual(MoveState.SKIPPABLE);
@@ -623,13 +623,13 @@ describe('classic (traditional) domino class', (): void => {
           Sasik: [DominoTile.of(3, 3), DominoTile.of(6, 6)],
           Bobo: [DominoTile.of(3, 0), DominoTile.of(1, 1)],
         },
-        stock: [],
+        stockSize: 0,
         ends: [DominoTile.of(2, 1), DominoTile.of(4, 5)],
       }
       const result: MoveState = rulesHandler.ableToPlay(
         testData.currentPlayer,
         testData.playerDecks,
-        testData.stock,
+        testData.stockSize,
         testData.ends
       )
       expect(result).toEqual(MoveState.DEAD_END);

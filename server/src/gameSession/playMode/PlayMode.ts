@@ -25,7 +25,7 @@ export default interface PlayMode {
   ableToPlay(
     currentPlayer: PlayerName,
     playersDecks: PlayersDecks,
-    stock: TilesDeck,
+    stockSize: number,
     ends: TilesDeck
   ): MoveState;
 }
