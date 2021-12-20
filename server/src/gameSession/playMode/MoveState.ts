@@ -1,7 +1,7 @@
 const enum MoveState {
   AVAILABLE,
   SKIPPABLE,
-  DEAD_END
+  DEAD_END,
 }
 
 export default MoveState;

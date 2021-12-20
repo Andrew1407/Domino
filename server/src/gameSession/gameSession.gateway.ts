@@ -1,7 +1,7 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
 import * as dotenv from 'dotenv';
-import RedisService from 'src/gameSession/storage/redis.service';
+import StorageService from 'src/gameSession/storage/storage.service';
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ export default class GameSessionGateway {
   @WebSocketServer() private readonly wss: Server;
   private sss: { [key: string]: WebSocket[] } = {};
 
-  constructor(private readonly db: RedisService) {}
+  constructor(private readonly db: StorageService) {}
 
   @SubscribeMessage('test-data')
   public async onTestData(@ConnectedSocket() client: WebSocket, @MessageBody() data: string) {
