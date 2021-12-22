@@ -5,7 +5,7 @@ import MoveState from './playMode/MoveState';
 import PlayMode, { FirstMoveResult, MoveOption, PlayersDecks } from './playMode/PlayMode';
 
 @Injectable()
-export default class ClassicDomino implements PlayMode {
+export default class ClassicDominoService implements PlayMode {
   public createDeck(): TilesDeck {
     const maxTileValue = 6;
     const tilesDeck: TilesDeck = [];

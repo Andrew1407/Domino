@@ -10,7 +10,6 @@ export type SessionData = {
   current_move?: PlayerName
 };
 
-// TODO: redundant method(s)
 export default interface StorageClient {
   createSession(sessionId: string, score: number, players: number): Promise<void>;
 
@@ -43,7 +42,7 @@ export default interface StorageClient {
 
   setPlayerScore(sessionId: string, player: PlayerName, newScore: number): Promise<void>;
 
-  setDeck(sessionId: string, deck: TilesDeck): Promise<void>;
+  removePlayerScore(sessionId: string, player: PlayerName): Promise<void>;
 
   getPlayersDecks(sessionId: string): Promise<PlayersDecks>;
 

@@ -1,4 +1,4 @@
-import ClassicScoreKeeper from '../classicScoreKeeper.service';
+import ScoreKeeperService from '../scoreKeeper.service';
 import DominoTile from '../entities/DominoTile';
 import { PlayerName } from '../entities/Player';
 import { PlayersDecks } from '../playMode/PlayMode';
@@ -19,7 +19,7 @@ type TestDataCheckWinner = {
 };
 
 describe('classic score keeper class', (): void => {
-  const scoreKeeper: ClassicScoreKeeper = new ClassicScoreKeeper();
+  const scoreKeeper: ScoreKeeperService = new ScoreKeeperService();
 
   describe('roundSumUp', (): void => {
     const testDataForCalc: TestDataSumUp[] = [

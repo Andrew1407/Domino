@@ -5,7 +5,7 @@ import { PlayersDecks } from './playMode/PlayMode';
 import ScoreKeeper, { PlayersScore } from './playMode/ScoreKeeper';
 
 @Injectable()
-export default class ClassicScoreKeeper implements ScoreKeeper {
+export default class ScoreKeeperService implements ScoreKeeper {
   public roundSumUp(
     playersDecks: PlayersDecks,
     currentScore: PlayersScore

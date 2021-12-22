@@ -1,22 +1,22 @@
+import { WsResponse } from '@nestjs/websockets';
 import DominoTile, { TilesDeck } from '../entities/DominoTile';
 import { PlayerName } from '../entities/Player';
 import { PlayersScore } from '../playMode/ScoreKeeper';
 import { SessionData } from '../storage/StorageClient';
 
-export default interface ReqWS<T> {
-  status: number,
-  event: string,
-  data: T
+export default interface GameSessionRes<T> extends WsResponse<T> {
+  errorStatus: string
 }
 
-export interface JoinedPlayerRes extends SessionData {
+export interface PlayerRes extends SessionData {
   name: PlayerName,
   scores: PlayersScore
 }
 
-export interface DecksInfoRes extends JoinedPlayerRes {
+export interface DecksInfoRes extends PlayerRes {
   deck?: TilesDeck,
-  tilesCount: PlayersScore
+  tilesCount: PlayersScore,
+  stock: number
 }
 
 export interface MoveRes extends DecksInfoRes {
@@ -27,4 +27,12 @@ export interface RoundRes extends SessionData {
   scores: PlayersScore,
   endGame: boolean,
   winner?: PlayerName
+}
+
+export interface DisconnectedRes {
+  name: PlayerName
+}
+
+export interface MovePermissionRes {
+  permission: boolean
 }

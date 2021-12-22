@@ -55,9 +55,6 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
       current_move?: PlayerName
     };
     const sessionDataRaw: SessionDataRaw = (await this.dbClient.HGETALL(field)) as SessionDataRaw;
-    if (!sessionDataRaw.current_move)
-      throw new Error('no current player is specified to make a move');
-
     return {
       score: parseInt(sessionDataRaw.score, 10),
       players: parseInt(sessionDataRaw.players, 10),
@@ -108,7 +105,6 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
     const stringified: string = JSON.stringify(tile);
     const removed: number = await this.dbClient.SREM(playerDeckField, stringified);
     if (removed !== 1) throw new Error('invalid deck entries');
-    // TODO: copyReversed
     const command: string = side === 'left' ? 'LPUSH' : 'RPUSH';
     await this.dbClient[command](commonDeckField, stringified);
   }
@@ -139,12 +135,6 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
   ): Promise<void> {
     const field: string = this.prefixedNamespace('players_score', sessionId);
     await this.dbClient.HSET(field, player, newScore);
-  }
-
-  public async setDeck(sessionId: string, deck: TilesDeck): Promise<void> {
-    const field: string = this.prefixedNamespace('deck', sessionId);
-    const stringified: string[] = this.stringifyTiles(deck);
-    await this.dbClient.RPUSH(field, stringified);
   }
 
   public async getPlayersDecks(sessionId: string): Promise<PlayersDecks> {
@@ -197,6 +187,10 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
     return size === 0;
   }
 
+  public async removePlayerScore(sessionId: string, player: PlayerName): Promise<void> {
+    const field: string = this.prefixedNamespace('players_score', sessionId);
+    await this.dbClient.HDEL(field, player);
+  }
 
   private async clearSessionData(sessionId: string): Promise<void> {
     const fields: string[] = ['stock', 'deck'];

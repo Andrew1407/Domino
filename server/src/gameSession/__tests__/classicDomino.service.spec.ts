@@ -1,4 +1,4 @@
-import ClassicDomino from '../classicDomino.service'
+import ClassicDominoService from '../classicDomino.service'
 import DominoTile, { TilesDeck } from '../entities/DominoTile';
 import { PlayerName } from '../entities/Player';
 import MoveState from '../playMode/MoveState';
@@ -34,7 +34,7 @@ type testDataAbleToPlay = {
 }
 
 describe('classic (traditional) domino class', (): void => {
-  const rulesHandler: ClassicDomino = new ClassicDomino();
+  const rulesHandler: ClassicDominoService = new ClassicDominoService();
 
   describe('createDeck', (): void => {
     const expectedDeck: TilesDeck = [

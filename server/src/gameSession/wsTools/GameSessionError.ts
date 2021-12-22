@@ -1,5 +1,5 @@
 import ErrorStatus from './ErrorStatus';
-import ReqWS from './responseTypes';
+import GameSessionRes from './responseTypes';
 
 export default class GameSessionError extends Error {
   public static notExists(): GameSessionError {
@@ -44,34 +44,37 @@ export default class GameSessionError extends Error {
     );
   }
 
-  public static catchHandler(
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ): PropertyDescriptor {
-    const original: any = descriptor.value;
-    descriptor.value = async function(
-      client: WebSocket, ...args: unknown[]
-    ): Promise<any> {
-      try {
-        await original.call(this, client, ...args);
-      } catch(e) {
-        const caught: GameSessionError = e instanceof GameSessionError ?
-          e : GameSessionError.internal();
-        client.send(JSON.stringify(caught.info()));
-      }
-    } 
-    return descriptor;
+  public static catchHandler(): (...args: unknown[]) => PropertyDescriptor {
+    return function(
+      target: any,
+      propertyKey: string,
+      descriptor: PropertyDescriptor
+    ): PropertyDescriptor {
+      const original: Function = descriptor.value;
+      descriptor.value = async function(...args: unknown[]): Promise<unknown> {
+        try {
+          const resArgs: unknown = await original.apply(this, args);
+          return resArgs;
+        } catch(e) {
+          console.log(e)
+          if (e instanceof GameSessionError) return e.info();
+          return GameSessionError.internal().info();
+        }
+      };
+
+      return descriptor;
+    };
+  }
+      
+      constructor(message: string, private readonly status: ErrorStatus) {
+        super(message);
   }
 
-  constructor(
-    message: string,
-    private readonly status: ErrorStatus
-  ) {
-    super(message);
-  }
-
-  public info(): ReqWS<string> {
-    return { status: this.status, data: this.message };
+  public info(): GameSessionRes<string> {
+    return {
+      event: 'error',
+      errorStatus: this.status,
+      data: this.message,
+    };
   }
 }
