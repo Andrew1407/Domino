@@ -10,5 +10,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16.x'
+      - uses: supercharge/redis-github-action@1.1.0
+        with:
           redis-version: '6.x'
       - run: cd server && cp .env.example .env && npm i && npm test
