@@ -29,8 +29,8 @@ describe('classic score keeper class', (): void => {
           Bobo: [DominoTile.of(0, 0), DominoTile.of(2, 1)],
           Mavun: [DominoTile.of(0, 5), DominoTile.of(4, 3), DominoTile.of(6, 6)],
         },
-        currentScore: { Bobo: 0, Mavun: 0, },
-        expectedScore: { Bobo: 24, Mavun: 0, },
+        currentScore: { Bobo: 0, Mavun: 0 },
+        expectedScore: { Bobo: 24, Mavun: 0 },
       },
       {
         players: 3,
@@ -39,8 +39,8 @@ describe('classic score keeper class', (): void => {
           Mavun: [DominoTile.of(0, 5), DominoTile.of(4, 3), DominoTile.of(6, 6)],
           Ruzur: [DominoTile.of(1, 1)],
         },
-        currentScore: { Bobo: 0, Mavun: 0, Ruzur: 0, },
-        expectedScore: { Ruzur: 27, Mavun: 0, Bobo: 0, },
+        currentScore: { Bobo: 0, Mavun: 0, Ruzur: 0 },
+        expectedScore: { Ruzur: 27, Mavun: 0, Bobo: 0 },
       },
       {
         players: 4,
@@ -50,8 +50,8 @@ describe('classic score keeper class', (): void => {
           Ruzur: [DominoTile.of(1, 1)],
           Sasik: [DominoTile.of(1, 0)],
         },
-        currentScore: { Bobo: 0, Mavun: 0, Ruzur: 0, Sasik: 0, },
-        expectedScore: { Sasik: 37, Mavun: 0, Bobo: 0, Ruzur: 0, },
+        currentScore: { Bobo: 0, Mavun: 0, Ruzur: 0, Sasik: 0 },
+        expectedScore: { Sasik: 37, Mavun: 0, Bobo: 0, Ruzur: 0 },
       },
     ];
 
@@ -62,8 +62,8 @@ describe('classic score keeper class', (): void => {
           Bobo: [DominoTile.of(0, 0), DominoTile.of(2, 1)],
           Mavun: [DominoTile.of(0, 5), DominoTile.of(4, 3), DominoTile.of(6, 6)],
         },
-        currentScore: { Bobo: 14, Mavun: 5, },
-        expectedScore: { Bobo: 38, Mavun: 5, },
+        currentScore: { Bobo: 14, Mavun: 5 },
+        expectedScore: { Bobo: 38, Mavun: 5 },
       },
       {
         players: 3,
@@ -72,8 +72,8 @@ describe('classic score keeper class', (): void => {
           Mavun: [DominoTile.of(0, 5), DominoTile.of(4, 3), DominoTile.of(6, 6)],
           Ruzur: [DominoTile.of(1, 1)],
         },
-        currentScore: { Bobo: 40, Mavun: 10, Ruzur: 17, },
-        expectedScore: { Ruzur: 44, Mavun: 10, Bobo: 40, },
+        currentScore: { Bobo: 40, Mavun: 10, Ruzur: 17 },
+        expectedScore: { Ruzur: 44, Mavun: 10, Bobo: 40 },
       },
       {
         players: 4,
@@ -83,8 +83,8 @@ describe('classic score keeper class', (): void => {
           Ruzur: [DominoTile.of(1, 1)],
           Sasik: [DominoTile.of(1, 0)],
         },
-        currentScore: { Bobo: 20, Mavun: 0, Ruzur: 5, Sasik: 89, },
-        expectedScore: { Sasik: 126, Mavun: 0, Bobo: 20, Ruzur: 5, },
+        currentScore: { Bobo: 20, Mavun: 0, Ruzur: 5, Sasik: 89 },
+        expectedScore: { Sasik: 126, Mavun: 0, Bobo: 20, Ruzur: 5 },
       },
     ];
 
@@ -95,7 +95,7 @@ describe('classic score keeper class', (): void => {
           Bobo: [DominoTile.of(0, 0), DominoTile.of(6, 6)],
           Mavun: [DominoTile.of(0, 5), DominoTile.of(1, 3), DominoTile.of(2, 1)],
         },
-        currentScore: { Bobo: 0, Mavun: 5, },
+        currentScore: { Bobo: 0, Mavun: 5 },
       },
       {
         players: 3,
@@ -104,7 +104,7 @@ describe('classic score keeper class', (): void => {
           Mavun: [DominoTile.of(0, 5), DominoTile.of(4, 3), DominoTile.of(6, 6)],
           Ruzur: [DominoTile.of(1, 3)],
         },
-        currentScore: { Bobo: 40, Mavun: 10, Ruzur: 17, },
+        currentScore: { Bobo: 40, Mavun: 10, Ruzur: 17 },
       },
       {
         players: 4,
@@ -114,7 +114,7 @@ describe('classic score keeper class', (): void => {
           Ruzur: [DominoTile.of(1, 2)],
           Sasik: [DominoTile.of(0, 3)],
         },
-        currentScore: { Bobo: 20, Mavun: 0, Ruzur: 5, Sasik: 89, },
+        currentScore: { Bobo: 20, Mavun: 0, Ruzur: 5, Sasik: 89 },
       },
     ];
 
@@ -149,19 +149,19 @@ describe('classic score keeper class', (): void => {
     const testDataIfWinner: TestDataCheckWinner[] = [
       {
         players: 2,
-        playersScore: { Bobo: 12, Mavun: 0, },
+        playersScore: { Bobo: 12, Mavun: 0 },
         finalScore: 12,
         expected: 'Bobo',
       },
       {
         players: 3,
-        playersScore: { Ruzur: 44, Mavun: 10, Bobo: 40, },
+        playersScore: { Ruzur: 44, Mavun: 10, Bobo: 40 },
         finalScore: 40,
         expected: 'Ruzur',
       },
       {
         players: 4,
-        playersScore: { Sasik: 126, Mavun: 0, Bobo: 20, Ruzur: 5, },
+        playersScore: { Sasik: 126, Mavun: 0, Bobo: 20, Ruzur: 5 },
         finalScore: 80,
         expected: 'Sasik',
       },
@@ -170,17 +170,17 @@ describe('classic score keeper class', (): void => {
     const testDataIfScoreLower: TestDataCheckWinner[] = [
       {
         players: 2,
-        playersScore: { Bobo: 12, Mavun: 0, },
+        playersScore: { Bobo: 12, Mavun: 0 },
         finalScore: 120,
       },
       {
         players: 3,
-        playersScore: { Ruzur: 44, Mavun: 10, Bobo: 40, },
+        playersScore: { Ruzur: 44, Mavun: 10, Bobo: 40 },
         finalScore: 400,
       },
       {
         players: 4,
-        playersScore: { Sasik: 16, Mavun: 0, Bobo: 20, Ruzur: 5, },
+        playersScore: { Sasik: 16, Mavun: 0, Bobo: 20, Ruzur: 5 },
         finalScore: 120,
       },
     ];

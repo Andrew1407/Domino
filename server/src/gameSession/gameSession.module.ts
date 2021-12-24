@@ -17,8 +17,8 @@ import { CLASSIC_DOMINO_SERVICE, SCORE_KEEPER_SERVICE } from './gameSession.opti
   ],
   controllers: [GameSessionController],
   providers: [
-    { provide: CLASSIC_DOMINO_SERVICE, useClass: ClassicDominoService, },
-    { provide: SCORE_KEEPER_SERVICE, useClass: ScoreKeeperService, },
+    { provide: CLASSIC_DOMINO_SERVICE, useClass: ClassicDominoService },
+    { provide: SCORE_KEEPER_SERVICE, useClass: ScoreKeeperService },
     GameSessionService,
     GameSessionGateway,
   ],

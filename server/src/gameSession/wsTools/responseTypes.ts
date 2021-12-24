@@ -20,19 +20,25 @@ export interface DecksInfoRes extends PlayerRes {
 }
 
 export interface MoveRes extends DecksInfoRes {
-  tile?: DominoTile
+  tile?: DominoTile,
+  commonDeck: TilesDeck
 }
 
 export interface RoundRes extends SessionData {
   scores: PlayersScore,
   endGame: boolean,
-  winner?: PlayerName
+  winner?: PlayerName,
+  deadEnd?: boolean 
 }
 
-export interface DisconnectedRes {
+export interface NameContainerRes {
   name: PlayerName
 }
 
 export interface MovePermissionRes {
   permission: boolean
+}
+
+export interface NextMoveRes extends NameContainerRes {
+  skippedBy?: PlayerName
 }

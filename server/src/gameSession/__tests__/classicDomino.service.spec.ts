@@ -2,7 +2,7 @@ import ClassicDominoService from '../classicDomino.service'
 import DominoTile, { TilesDeck } from '../entities/DominoTile';
 import { PlayerName } from '../entities/Player';
 import MoveState from '../playMode/MoveState';
-import { FirstMoveResult, MoveOption, PlayersDecks } from '../playMode/PlayMode';
+import { MoveOption, PlayersDecks } from '../playMode/PlayMode';
 
 type testDataDistTiles = {
   playersNumber: number,
@@ -15,7 +15,7 @@ type testDataDistTiles = {
 type testDataFirstMove = {
   playersNumber: number,
   playersDecks: PlayersDecks,
-  expected: FirstMoveResult,
+  expected: [PlayerName, DominoTile],
 }
 
 type testDataMovePermission = {
@@ -138,29 +138,7 @@ describe('classic (traditional) domino class', (): void => {
             DominoTile.of(2, 2),
           ],
         },
-        expected: [
-          'Mavun',
-          DominoTile.of(5, 5),
-          {
-            Bobo: [
-              DominoTile.of(0, 0),
-              DominoTile.of(0, 2),
-              DominoTile.of(3, 6),
-              DominoTile.of(1, 4),
-              DominoTile.of(5, 6),
-              DominoTile.of(2, 4),
-              DominoTile.of(1, 5),
-            ],
-            Mavun: [
-              DominoTile.of(4, 4),
-              DominoTile.of(3, 5),
-              DominoTile.of(1, 6),
-              DominoTile.of(3, 3),
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 2),
-            ],
-          },
-        ],
+        expected: ['Mavun', DominoTile.of(5, 5)],
       },
       {
         playersNumber: 3,
@@ -187,32 +165,7 @@ describe('classic (traditional) domino class', (): void => {
             DominoTile.of(4, 6),
           ],
         },
-        expected: [
-          'Sasik',
-          DominoTile.of(6, 6),
-          {
-            Bobo: [
-              DominoTile.of(0, 0),
-              DominoTile.of(0, 2),
-              DominoTile.of(3, 6),
-              DominoTile.of(1, 4),
-              DominoTile.of(5, 6),
-            ],
-            Mavun: [
-              DominoTile.of(3, 5),
-              DominoTile.of(1, 6),
-              DominoTile.of(3, 3),
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 2),
-            ],
-            Sasik: [
-              DominoTile.of(2, 4),
-              DominoTile.of(1, 5),
-              DominoTile.of(4, 4),
-              DominoTile.of(4, 6),
-            ],
-          },
-        ],
+        expected: ['Sasik', DominoTile.of(6, 6)],
       },
       {
         playersNumber: 4,
@@ -246,39 +199,7 @@ describe('classic (traditional) domino class', (): void => {
             DominoTile.of(0, 6),
           ],
         },
-        expected: [
-          'Ruzur',
-          DominoTile.of(6, 6),
-          {
-            Bobo: [
-              DominoTile.of(0, 0),
-              DominoTile.of(0, 2),
-              DominoTile.of(3, 6),
-              DominoTile.of(1, 4),
-              DominoTile.of(5, 6),
-            ],
-            Mavun: [
-              DominoTile.of(3, 5),
-              DominoTile.of(1, 6),
-              DominoTile.of(3, 3),
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 2),
-            ],
-            Sasik: [
-              DominoTile.of(2, 4),
-              DominoTile.of(1, 5),
-              DominoTile.of(5, 5),
-              DominoTile.of(4, 4),
-              DominoTile.of(4, 6),
-            ],
-            Ruzur: [
-              DominoTile.of(2, 6),
-              DominoTile.of(1, 3),
-              DominoTile.of(1, 1),
-              DominoTile.of(0, 6),
-            ],
-          },
-        ],
+        expected: ['Ruzur', DominoTile.of(6, 6)],
       },
     ];
 
@@ -305,29 +226,7 @@ describe('classic (traditional) domino class', (): void => {
             DominoTile.of(2, 6),
           ],
         },
-        expected: [
-          'Bobo',
-          DominoTile.of(5, 6),
-          {
-            Bobo: [
-              DominoTile.of(0, 1),
-              DominoTile.of(0, 2),
-              DominoTile.of(3, 6),
-              DominoTile.of(1, 4),
-              DominoTile.of(2, 4),
-              DominoTile.of(1, 5),
-            ],
-            Mavun: [
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 4),
-              DominoTile.of(3, 5),
-              DominoTile.of(1, 6),
-              DominoTile.of(1, 3),
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 6),
-            ],
-          },
-        ],
+        expected: ['Bobo', DominoTile.of(5, 6)],
       },
       {
         playersNumber: 3,
@@ -354,32 +253,7 @@ describe('classic (traditional) domino class', (): void => {
             DominoTile.of(4, 5),
           ],
         },
-        expected: [
-          'Bobo',
-          DominoTile.of(4, 6),
-          {
-            Bobo: [
-              DominoTile.of(0, 1),
-              DominoTile.of(0, 2),
-              DominoTile.of(3, 6),
-              DominoTile.of(1, 4),
-            ],
-            Mavun: [
-              DominoTile.of(3, 5),
-              DominoTile.of(1, 6),
-              DominoTile.of(2, 3),
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 6),
-            ],
-            Sasik: [
-              DominoTile.of(2, 4),
-              DominoTile.of(1, 5),
-              DominoTile.of(3, 6),
-              DominoTile.of(3, 4),
-              DominoTile.of(4, 5),
-            ],
-          },
-        ],
+        expected: ['Bobo', DominoTile.of(4, 6)],
       },
       {
         playersNumber: 4,
@@ -413,46 +287,14 @@ describe('classic (traditional) domino class', (): void => {
             DominoTile.of(4, 6),
           ],
         },
-        expected: [
-          'Ruzur',
-          DominoTile.of(4, 6),
-          {
-            Bobo: [
-              DominoTile.of(0, 1),
-              DominoTile.of(0, 2),
-              DominoTile.of(0, 3),
-              DominoTile.of(0, 4),
-              DominoTile.of(0, 5),
-            ],
-            Mavun: [
-              DominoTile.of(0, 6),
-              DominoTile.of(1, 2),
-              DominoTile.of(1, 3),
-              DominoTile.of(1, 4),
-              DominoTile.of(1, 5),
-            ],
-            Sasik: [
-              DominoTile.of(1, 6),
-              DominoTile.of(2, 3),
-              DominoTile.of(2, 4),
-              DominoTile.of(2, 5),
-              DominoTile.of(2, 6),
-            ],
-            Ruzur: [
-              DominoTile.of(3, 4),
-              DominoTile.of(3, 5),
-              DominoTile.of(3, 6),
-              DominoTile.of(4, 5),
-            ],
-          },
-        ],
+        expected: ['Ruzur', DominoTile.of(4, 6)],
       },
     ];
 
     it.each(testDataForDouble)(
       'should pick a player and a double tile for the first move ($playersNumber players)',
       ({ playersDecks, expected }: testDataFirstMove): void => {
-        const result: FirstMoveResult = rulesHandler.pickFirstMove(playersDecks);
+        const result: [PlayerName, DominoTile] = rulesHandler.pickFirstMove(playersDecks);
         expect(result).toStrictEqual(expected);
       }
     );
@@ -460,7 +302,7 @@ describe('classic (traditional) domino class', (): void => {
     it.each(testDataForMaxSum)(
       'should pick a max tile when there is no double ($playersNumber players)',
       ({ playersDecks, expected }: testDataFirstMove): void => {
-        const result: FirstMoveResult = rulesHandler.pickFirstMove(playersDecks);
+        const result: [PlayerName, DominoTile] = rulesHandler.pickFirstMove(playersDecks);
         expect(result).toStrictEqual(expected);
       }
     );

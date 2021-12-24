@@ -3,7 +3,6 @@ import { PlayerName } from '../entities/Player';
 import MoveState from './MoveState';
 
 export type PlayersDecks = Partial<{ [key in PlayerName]: TilesDeck; }>;
-export type FirstMoveResult = [PlayerName, DominoTile, PlayersDecks];
 export type MoveOption = 'left' | 'right';
 
 export default interface PlayMode {
@@ -14,7 +13,7 @@ export default interface PlayMode {
     deck: TilesDeck
   ): [PlayersDecks, TilesDeck];
   
-  pickFirstMove(playersDecks: PlayersDecks): FirstMoveResult;
+  pickFirstMove(playersDecks: PlayersDecks): [PlayerName, DominoTile];
 
   checkMovePermission(
     tile: DominoTile,

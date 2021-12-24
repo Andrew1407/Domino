@@ -1,14 +1,14 @@
 import { setTimeout } from 'timers/promises';
 import { BeforeApplicationShutdown } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
-import { Server, WebSocket } from 'ws';
+import { WebSocket } from 'ws';
 import * as dotenv from 'dotenv';
 import GameSessionService from './gameSession.service';
 import GameSessionError from './wsTools/GameSessionError';
-import { availablePlayers, PlayerName } from './entities/Player';
-import GameSessionRes, { DecksInfoRes, PlayerRes, MoveRes, DisconnectedRes, MovePermissionRes, RoundRes } from './wsTools/responseTypes';
+import { PlayerName } from './entities/Player';
+import GameSessionRes, { DecksInfoRes, PlayerRes, MoveRes, NameContainerRes, MovePermissionRes, RoundRes, NextMoveRes } from './wsTools/responseTypes';
 import ErrorStatus from './wsTools/ErrorStatus';
-import DominoTile from './entities/DominoTile';
+import DominoTile, { EndValue } from './entities/DominoTile';
 import { MoveOption } from './playMode/PlayMode';
 import MoveState from './playMode/MoveState';
 
@@ -19,7 +19,7 @@ interface SessionPlayer {
 
 type GameSessions = { [session: string]: SessionPlayer[] };
 type GameSessionResP<T> = Promise<GameSessionRes<T>>;
-type TileData = { left: number, right: number };
+type TileData = { left: string, right: string };
 
 dotenv.config();
 
@@ -28,7 +28,6 @@ const WS_ROUTE: string = process.env.WS_ROUTE || '/domino-session';
 
 @WebSocketGateway(WS_PORT, { path: WS_ROUTE })
 export default class GameSessionGateway implements BeforeApplicationShutdown, OnGatewayDisconnect {
-  @WebSocketServer() private readonly wss: Server;
   private sessions: GameSessions = {};
 
   constructor(public readonly sessionHandler: GameSessionService) {}
@@ -59,7 +58,7 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
         for (const { socket } of this.sessions[sid])
           socket.send(this.responseWrapperStr(notifyData, 'leaveSession'));
       } else {
-        const disconnectedData: DisconnectedRes = { name: disconnected.name };
+        const disconnectedData: NameContainerRes = { name: disconnected.name };
         for (const { socket } of this.sessions[sid]) {
           socket.send(this.responseWrapperStr(disconnectedData, 'interruptedSession'));
           socket.close();
@@ -71,15 +70,6 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     }
   }
   
-  @SubscribeMessage('test-data')
-  @GameSessionError.catchHandler()
-  public onTestData(@ConnectedSocket() client: WebSocket, @MessageBody() data: string): WsResponse<string> {
-    // this.sss[data] ??= [];
-    // this.sss[data].push(client);
-    // return data.length;
-    return { event: 'sasa', data };
-  }
-
   @SubscribeMessage('joinSession')
   @GameSessionError.catchHandler()
   public async onSessionJoin(
@@ -103,12 +93,12 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
   @SubscribeMessage('moveCheck')
   @GameSessionError.catchHandler()
   public async onMoveCheck(
+    @ConnectedSocket() client: WebSocket,
     @MessageBody('session') session: string,
-    @MessageBody('player') player: PlayerName,
     @MessageBody('tile') tileData: TileData,
     @MessageBody('side') moveSide: MoveOption
   ): GameSessionResP<MovePermissionRes> {
-    await this.validateParams(session, player);
+    const player: PlayerName = await this.validatePlayerParams(client, session);
     if (moveSide !== 'left' && moveSide !== 'right') throw GameSessionError.badRequest();
     const tile: DominoTile = this.parseTileData(tileData);
     const permission: boolean = await this.sessionHandler
@@ -119,12 +109,12 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
   @SubscribeMessage('moveAction')
   @GameSessionError.catchHandler()
   public async onMoveAction(
+    @ConnectedSocket() client: WebSocket,
     @MessageBody('session') session: string,
-    @MessageBody('player') player: PlayerName,
     @MessageBody('tile') tileData: TileData,
     @MessageBody('side') moveSide: MoveOption
   ): Promise<void> {
-    await this.validateParams(session, player);
+    const player: PlayerName = await this.validatePlayerParams(client, session);
     if (moveSide !== 'left' && moveSide !== 'right') throw GameSessionError.badRequest();
     const tile: DominoTile = this.parseTileData(tileData);
     const moveRes: MoveRes[] =
@@ -132,70 +122,76 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     this.notifyPlayers(session, moveRes, 'moveAction');
     const emptyDeck: boolean = await this.sessionHandler.outOfTiles(session, player);
     if (emptyDeck) this.endRound(session);
-
+    else this.nextPlayerMove(session);
   }
 
-  // TODO: get player's name by socket client (without sending);
-  // from stock doesn't add new tile somehow
   @SubscribeMessage('fromStock')
   @GameSessionError.catchHandler()
   public async onTakeFromStock(
-    @MessageBody('session') session: string,
-    @MessageBody('player') player: PlayerName
+    @ConnectedSocket() client: WebSocket,
+    @MessageBody('session') session: string
   ): Promise<void> {
-    await this.validateParams(session, player);
-    let stockRes: MoveRes[];
+    const player: PlayerName = await this.validatePlayerParams(client, session);
     try {
-      stockRes = await this.sessionHandler.getFromStock(session, player);
+      const stockRes: MoveRes[] =
+        await this.sessionHandler.getFromStock(session, player);
+      this.notifyPlayers(session, stockRes, 'fromStock');
+      this.hanldeMoveState(session, player);
     } catch(e) {
       const emptyStockMsg: string = 'there are no tiles in the stock';
       if (e.message !== emptyStockMsg) throw e;
-      throw GameSessionError.forbidden();
+      throw GameSessionError.emptyStock();
     }
-    this.notifyPlayers(session, stockRes, 'fromStock');
-    const moveState: MoveState = await this.sessionHandler.ableToPlay(session, player);
-    if (moveState === MoveState.SKIPPABLE) this.nextPlayerMove(session);
-    else if (moveState === MoveState.DEAD_END) this.endRound(session);
   }
 
-  public async validateParams(
-    session: string,
-    player: PlayerName
-  ): Promise<void> {
+  private async validatePlayerParams(
+    socket: WebSocket,
+    session: string
+  ): Promise<PlayerName> {
     if (typeof session !== 'string') throw GameSessionError.badRequest();
-    if (!availablePlayers.includes(player)) throw GameSessionError.badRequest();
-    const shouldMove: boolean = await this.sessionHandler.shouldMove(session, player);
+    const player: SessionPlayer = this.sessions[session]?.find(
+      (p: SessionPlayer): boolean => p.socket === socket
+    );
+    if (!player) throw GameSessionError.forbidden();
+    const shouldMove: boolean =
+      await this.sessionHandler.shouldMove(session, player.name);
     if (!shouldMove) throw GameSessionError.unavailableMove();
+    return player.name;
   }
 
-  private async endRound(session: string): Promise<void> {
+  private async endRound(
+    session: string,
+    deadEnd: boolean = false
+  ): Promise<void> {
     const delay: number = 1000;
     await setTimeout(delay);
     const roundRes: RoundRes = await this.sessionHandler.endRound(session);
+    roundRes.deadEnd = deadEnd;
     for (const { socket } of this.sessions[session]) {
       socket.send(this.responseWrapperStr(roundRes, 'endRound'));
       if (roundRes.endGame) socket.close();
     }
-    if (roundRes.endGame) {
-      await this.sessionHandler.removeSession(session);
-      delete this.sessions[session];
-    }
+    if (!roundRes.endGame) return this.startNewRound(session);
+    await this.sessionHandler.removeSession(session);
+    delete this.sessions[session];
   }
 
   private parseTileData(tile: TileData): DominoTile {
     if (!tile) throw GameSessionError.badRequest();
     const { left, right }: TileData = tile;
-    if (typeof left !== 'string' || typeof right !== 'string')
+    const leftParsed: number = parseInt(left, 10);
+    const rightParsed: number = parseInt(right, 10);
+    if (isNaN(leftParsed) || isNaN(rightParsed))
       throw GameSessionError.badRequest();
-    const invalidLeftValue: boolean = left < 0 || left > 6;
-    const invalidRightValue: boolean = right < 0 || right > 6;
+    const invalidLeftValue: boolean = leftParsed < 0 || leftParsed > 6;
+    const invalidRightValue: boolean = rightParsed < 0 || rightParsed > 6;
     if (invalidLeftValue || invalidRightValue)
       throw GameSessionError.badRequest();
-    return DominoTile.of(left, right);
+    return DominoTile.of(leftParsed as EndValue, rightParsed as EndValue);
   }
 
   private async startNewRound(session: string): Promise<void> {
-    const delay: number = 3000;
+    const delay: number = 1000;
     await setTimeout(delay);
     const decksInfo: DecksInfoRes[] = await this.sessionHandler.roundSetup(session);
     this.notifyPlayers(session, decksInfo, 'roundStart');
@@ -205,15 +201,30 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     this.nextPlayerMove(session);
   }
 
-  private async nextPlayerMove(session: string): Promise<void> {
+  private async nextPlayerMove(
+    session: string,
+    previous: PlayerName = null
+  ): Promise<void> {
     const delay = 1000;
     await setTimeout(delay);
     const nextPlayer: PlayerName = await this.sessionHandler.setNextPlayer(session);
+    const nextMoveInfo: NextMoveRes = { name: nextPlayer };
+    if (previous) nextMoveInfo.skippedBy = previous;
     for (const { socket } of this.sessions[session])
-      socket.send(this.responseWrapperStr(nextPlayer, 'nextMove'));
-    const moveState: MoveState = await this.sessionHandler.ableToPlay(session, nextPlayer);
-    if (moveState === MoveState.SKIPPABLE) this.nextPlayerMove(session);
-    else if (moveState === MoveState.DEAD_END) this.endRound(session);
+      socket.send(this.responseWrapperStr(nextMoveInfo, 'nextMove'));
+    this.hanldeMoveState(session, nextPlayer);
+  }
+
+  private async hanldeMoveState(
+    session: string,
+    player: PlayerName
+  ): Promise<void> {
+    const moveState: MoveState =
+      await this.sessionHandler.ableToPlay(session, player);
+    if (moveState === MoveState.SKIPPABLE)
+      this.nextPlayerMove(session, player);
+    else if (moveState === MoveState.DEAD_END)
+      this.endRound(session, true);
   }
 
   private notifyPlayers<T extends { name: PlayerName }>(

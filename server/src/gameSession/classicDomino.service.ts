@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import DominoTile, { TilesDeck, EndValue } from './entities/DominoTile';
 import { PlayerName } from './entities/Player';
 import MoveState from './playMode/MoveState';
-import PlayMode, { FirstMoveResult, MoveOption, PlayersDecks } from './playMode/PlayMode';
+import PlayMode, { MoveOption, PlayersDecks } from './playMode/PlayMode';
 
 @Injectable()
 export default class ClassicDominoService implements PlayMode {
@@ -35,7 +35,7 @@ export default class ClassicDominoService implements PlayMode {
     return [playersDecks, tilesLeft];
   }
 
-  public pickFirstMove(playersDecks: PlayersDecks): FirstMoveResult {
+  public pickFirstMove(playersDecks: PlayersDecks): [PlayerName, DominoTile] {
     const copyReducer = (
       acc: PlayersDecks,
       [key, el]: [string, TilesDeck]
@@ -72,9 +72,7 @@ export default class ClassicDominoService implements PlayMode {
 
     const foundTile: DominoTile = maxDouble.value ?? maxTileSum.value;
     const foundPlayer: PlayerName = maxDouble.name ?? maxTileSum.name;
-    leftDeck[foundPlayer] = leftDeck[foundPlayer]
-      .filter((t: DominoTile): boolean => t !== foundTile);
-    return [foundPlayer, foundTile, leftDeck];
+    return [foundPlayer, foundTile];
   }
 
   public checkMovePermission(

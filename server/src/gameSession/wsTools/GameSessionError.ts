@@ -44,6 +44,13 @@ export default class GameSessionError extends Error {
     );
   }
 
+  public static emptyStock(): GameSessionError {
+    return new GameSessionError(
+      'You cannot get tiles from the empty stock',
+      ErrorStatus.EMPTY_STOCK
+    );
+  }
+
   public static catchHandler(): (...args: unknown[]) => PropertyDescriptor {
     return function(
       target: any,

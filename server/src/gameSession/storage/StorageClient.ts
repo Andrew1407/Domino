@@ -29,11 +29,14 @@ export default interface StorageClient {
 
   getStockSize(sessionId: string): Promise<number>;
 
+  getCommonDeck(sessionId: string): Promise<TilesDeck>;
+
   setMoveAction(
     sessionId: string,
     player: PlayerName,
     tile: DominoTile,
-    side: MoveOption
+    side: MoveOption,
+    reversed: boolean
   ): Promise<void>;
 
   getDeckEnds(sessionId: string): Promise<TilesDeck>;

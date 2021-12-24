@@ -98,7 +98,8 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
     sessionId: string,
     player: PlayerName,
     tile: DominoTile,
-    side: MoveOption
+    side: MoveOption,
+    reversed: boolean
   ): Promise<void> {
     const playerDeckField: string = this.prefixedNamespace('player_deck', sessionId, player);
     const commonDeckField: string = this.prefixedNamespace('deck', sessionId);
@@ -106,7 +107,9 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
     const removed: number = await this.dbClient.SREM(playerDeckField, stringified);
     if (removed !== 1) throw new Error('invalid deck entries');
     const command: string = side === 'left' ? 'LPUSH' : 'RPUSH';
-    await this.dbClient[command](commonDeckField, stringified);
+    const tileToPush: string = reversed ?
+      JSON.stringify(tile.copyReversed()) : stringified;
+    await this.dbClient[command](commonDeckField, tileToPush);
   }
 
   public async getDeckEnds(sessionId: string): Promise<TilesDeck> {
@@ -164,7 +167,7 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
   public async getSessionPlayers(sessionId: string): Promise<PlayerName[]> {
     const field: string = this.prefixedNamespace('players_score', sessionId);
     const players: string[] = await this.dbClient.HKEYS(field);
-    return players.map((p: string): PlayerName => p as PlayerName);
+    return players as PlayerName[];
   }
 
   public async removeSession(sessionId: string): Promise<void> {
@@ -192,6 +195,12 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
     await this.dbClient.HDEL(field, player);
   }
 
+  public async getCommonDeck(sessionId: string): Promise<TilesDeck> {
+    const field: string = this.prefixedNamespace('deck', sessionId);
+    const stringified: string[] = await this.dbClient.LRANGE(field, 0, -1);
+    return stringified.map((t: string): DominoTile => this.parseTile(t));
+  }
+
   private async clearSessionData(sessionId: string): Promise<void> {
     const fields: string[] = ['stock', 'deck'];
     const removable: string[] = await this.getPlayersPaths(sessionId);
@@ -201,8 +210,10 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
   }
 
   private async getPlayersPaths(sessionId: string): Promise<string[]> {
-    const sessionPlayers: string = this.prefixedNamespace('player_deck', sessionId, '*');
-    return this.dbClient.KEYS(sessionPlayers);
+    const players: string[] = await this.getSessionPlayers(sessionId);
+    return players.map(
+      (p: string): string => this.prefixedNamespace('player_deck', sessionId, p)
+    );
   }
 
   private async searchUserDeck (playerField: string): Promise<[PlayerName, TilesDeck]> {

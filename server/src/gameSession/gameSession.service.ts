@@ -4,7 +4,7 @@ import DominoTile, { TilesDeck } from './entities/DominoTile';
 import { availablePlayers, PlayerName } from './entities/Player';
 import { CLASSIC_DOMINO_SERVICE, SCORE_KEEPER_SERVICE } from './gameSession.options';
 import MoveState from './playMode/MoveState';
-import PlayMode, { FirstMoveResult, MoveOption, PlayersDecks } from './playMode/PlayMode';
+import PlayMode, { MoveOption, PlayersDecks } from './playMode/PlayMode';
 import ScoreKeeper, { PlayersScore } from './playMode/ScoreKeeper';
 import { STORAGE_CLIENT } from './storage/storage.options';
 import StorageClient, { SessionData } from './storage/StorageClient';
@@ -40,7 +40,7 @@ export default class GameSessionService {
     const name: PlayerName = this.pickName(curPlayers);
     await this.storage.setPlayerScore(sessionId, name, 0);
     const scores: PlayersScore = await this.storage.getPlayersScore(sessionId)
-    return { ...sessionData, name, scores, };
+    return { ...sessionData, name, scores };
   }
 
   public async shouldWaitForPlayers(sessionId: string): Promise<boolean> {
@@ -62,24 +62,23 @@ export default class GameSessionService {
         this.storage.setPlayerDeck(sessionId, p, playersDecks[p])
       )),
     ]);
-    return this.formatResponseDecks(sessionId, playersDecks);
+    return this.formatResponseDecks(sessionId);
   }
 
   public async firstMove(sessionId: string): Promise<MoveRes[]> {
     await this.sessionExists(sessionId);
     const playersDecks: PlayersDecks =
       await this.storage.getPlayersDecks(sessionId);
-    const [ firstPlayer, firstTile, playersDecksNew ]: FirstMoveResult =
+    const [ firstPlayer, firstTile ]: [PlayerName, DominoTile] =
       this.playMode.pickFirstMove(playersDecks);
     await Promise.all([
       this.storage.setCurrentMove(sessionId, firstPlayer),
-      this.storage.setMoveAction(sessionId, firstPlayer, firstTile, 'right'),
+      this.storage.setMoveAction(sessionId, firstPlayer, firstTile, 'right', false),
     ]);
     return this.formatResponseMove(
       sessionId,
       firstPlayer,
       firstTile,
-      playersDecksNew,
       ['deck']
     );
   }
@@ -113,18 +112,15 @@ export default class GameSessionService {
   ) : Promise<MoveRes[]> {
     const [ possible, comparable ]: [boolean, DominoTile] =
       await this.getMoveActionParams(sessionId, player, tile, side);
-    if (!possible) throw GameSessionError.forbidden();
-    const shouldBeReversed: boolean = side === 'left' ?
-      comparable.left === tile.right :
-      comparable.right === tile.left;
-    const movedTile: DominoTile = shouldBeReversed ? tile.copyReversed() : tile;
-    await this.storage.setMoveAction(sessionId, player, movedTile, side);
-    const playersDecks: PlayersDecks = await this.storage.getPlayersDecks(sessionId);
+    if (!possible) throw GameSessionError.badRequest();
+    const reversed: boolean = side === 'left' ?
+      comparable.left !== tile.right :
+      comparable.right !== tile.left;
+    await this.storage.setMoveAction(sessionId, player, tile, side, reversed);
     return this.formatResponseMove(
       sessionId,
       player,
-      movedTile,
-      playersDecks,
+      reversed ? tile.copyReversed() : tile,
       ['deck']
     );
   }
@@ -135,17 +131,12 @@ export default class GameSessionService {
   ): Promise<MoveRes[]> {
     await this.sessionExists(sessionId);
     await this.playerExists(sessionId, player);
-    const [ playersDecks, tile ]: [PlayersDecks, DominoTile] =
-      await Promise.all([
-        this.storage.getPlayersDecks(sessionId),
-        this.storage.getFromStock(sessionId),
-      ]);
+    const tile: DominoTile = await this.storage.getFromStock(sessionId);
     await this.storage.setPlayerDeck(sessionId, player, [tile]);
     return this.formatResponseMove(
       sessionId,
       player,
       tile,
-      playersDecks,
       ['deck', 'tile']
     );
   }
@@ -223,7 +214,7 @@ export default class GameSessionService {
 
   private getRoundWinner(oldScore: PlayersScore, newScore: PlayersScore): PlayerName {
     for (const player in oldScore)
-      if (oldScore[player] === newScore[player])
+      if (oldScore[player] !== newScore[player])
         return player as PlayerName;
 
     return null;
@@ -254,14 +245,14 @@ export default class GameSessionService {
     sessionId: string,
     player: PlayerName,
     tile: DominoTile,
-    playersDecks: PlayersDecks,
     removable: (keyof MoveRes)[]
   ): Promise<MoveRes[]> {
     const decksInfo: DecksInfoRes[] =
-      await this.formatResponseDecks(sessionId, playersDecks);
+      await this.formatResponseDecks(sessionId);
     const firstMoveInfo: MoveRes[] = [];
+    const commonDeck: TilesDeck = await this.storage.getCommonDeck(sessionId);
     for (const deckInfo of decksInfo) {
-      const moveInfo: MoveRes = { ...deckInfo, tile, };
+      const moveInfo: MoveRes = { ...deckInfo, tile, commonDeck };
       if (moveInfo.name !== player)
         removable.forEach((key: keyof MoveRes): void => {
           delete moveInfo[key];
@@ -278,19 +269,17 @@ export default class GameSessionService {
     return [curPlayers, sessionData];
   }
 
-  private async formatResponseDecks(
-    sessionId: string,
-    playersDecks: PlayersDecks
-  ): Promise<DecksInfoRes[]> {
-    const [ sessionData, scores, stock ]: [SessionData, PlayersScore, number] =
-      await Promise.all([
-        this.storage.getSessionData(sessionId),
-        this.storage.getPlayersScore(sessionId),
-        this.storage.getStockSize(sessionId),
-      ]);
+  private async formatResponseDecks(sessionId: string): Promise<DecksInfoRes[]> {
+    const [ sessionData, scores, stock, decks ]:
+    [SessionData, PlayersScore, number, PlayersDecks] = await Promise.all([
+      this.storage.getSessionData(sessionId),
+      this.storage.getPlayersScore(sessionId),
+      this.storage.getStockSize(sessionId),
+      this.storage.getPlayersDecks(sessionId),
+    ]);
     const playersData: DecksInfoRes[] = [];
-    for (const player in playersDecks) {
-      const tilesCount: PlayersScore = Object.entries(playersDecks)
+    for (const player in decks) {
+      const tilesCount: PlayersScore = Object.entries(decks)
         .filter(([p]: [PlayerName, TilesDeck]): boolean => p !== player)
         .reduce((
             acc: PlayersScore,
@@ -302,7 +291,7 @@ export default class GameSessionService {
         stock,
         scores,
         name: player as PlayerName,
-        deck: playersDecks[player],
+        deck: decks[player],
         tilesCount, 
       });
     }
