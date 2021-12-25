@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Header, HttpCode, HttpStatus } from '@nestjs/common';
 import AppService from './app.service';
 
 @Controller()
@@ -7,7 +7,8 @@ export default class AppController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  public getMenuPage(): string {
-    return this.service.getTitle();
+  @Header('content-type', 'application/json')
+  public getCommandsList(): Promise<string> {
+    return this.service.getCommands();
   }
 }

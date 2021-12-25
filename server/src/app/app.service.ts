@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import commands from './commands.json';
 
 @Injectable()
 export default class AppService {
-  public getTitle(): string {
-    return 'Domino game menu (work in progress)';
+  public async getCommands(): Promise<string> {
+    return JSON.stringify(commands);
   }
 }

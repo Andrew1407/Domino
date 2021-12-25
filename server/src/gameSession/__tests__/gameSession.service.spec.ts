@@ -14,7 +14,7 @@ import DominoTile, { EndValue, TilesDeck } from '../entities/DominoTile';
 
 dotenv.config();
 
-describe('GameSessionService class', (): void => {
+describe('game session service class', (): void => {
   const dbClient = createClient({
     url: process.env.REDIS_URL ?? 'redis://localhost:6379',
   });

@@ -1,0 +1,27 @@
+{
+  "HTTP requests": {
+    "GET /domino-session?players=<number>&score=<number>": "creates a new session with given params (from query) and gives a new session id",
+    "POST /domino-session": "creates a new session with given params (from body) and gives a new session id"
+  },
+  "WebSocket commands": {
+    "server events": {
+      "joinSession": "joins a client by given session id",
+      "moveCheck": "checks if a current player can make a move with a given tile at specified side",
+      "moveAction": "makes a move with a given tile at specified side",
+      "fromStock": "gives a randon tile from the stock to a player"
+    },
+    "client events": {
+      "leaveSession": "notifices players about player who left before a game starts",
+      "interruptedSession": "closes session and notifies players about it if one of the players has left it during a game",
+      "sessionNewcomer": "notifies players about new one who has joined a current session before game",
+      "joinSession": "gives access to session info",
+      "moveCheck": "gives player permission whether to move tile",
+      "moveAction": "gives a new state of the decks after player makes a move",
+      "fromStock": "adds a new tile to the player's deck",
+      "endRound": "sums up a current round scores, check a possible end of game, notifies players about it",
+      "roundStart": "sets up players decks, scores etc.",
+      "firstMove": "gives the firts player who has to make a move",
+      "nextMove": "switches a current move and notfies users about next one"
+    }
+  }
+}

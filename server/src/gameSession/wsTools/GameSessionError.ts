@@ -63,7 +63,6 @@ export default class GameSessionError extends Error {
           const resArgs: unknown = await original.apply(this, args);
           return resArgs;
         } catch(e) {
-          console.log(e)
           if (e instanceof GameSessionError) return e.info();
           return GameSessionError.internal().info();
         }

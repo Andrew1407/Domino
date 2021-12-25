@@ -59,7 +59,8 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
           socket.send(this.responseWrapperStr(notifyData, 'leaveSession'));
       } else {
         const disconnectedData: NameContainerRes = { name: disconnected.name };
-        for (const { socket } of this.sessions[sid]) {
+        for (const { socket, name } of this.sessions[sid]) {
+          if (disconnected.name === name) continue;
           socket.send(this.responseWrapperStr(disconnectedData, 'interruptedSession'));
           socket.close();
         }
@@ -133,10 +134,9 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
   ): Promise<void> {
     const player: PlayerName = await this.validatePlayerParams(client, session);
     try {
-      const stockRes: MoveRes[] =
-        await this.sessionHandler.getFromStock(session, player);
+      const stockRes: MoveRes[] = await this.sessionHandler.getFromStock(session, player);
       this.notifyPlayers(session, stockRes, 'fromStock');
-      this.hanldeMoveState(session, player);
+      this.handleMoveState(session, player);
     } catch(e) {
       const emptyStockMsg: string = 'there are no tiles in the stock';
       if (e.message !== emptyStockMsg) throw e;
@@ -212,10 +212,10 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     if (previous) nextMoveInfo.skippedBy = previous;
     for (const { socket } of this.sessions[session])
       socket.send(this.responseWrapperStr(nextMoveInfo, 'nextMove'));
-    this.hanldeMoveState(session, nextPlayer);
+    this.handleMoveState(session, nextPlayer);
   }
 
-  private async hanldeMoveState(
+  private async handleMoveState(
     session: string,
     player: PlayerName
   ): Promise<void> {
