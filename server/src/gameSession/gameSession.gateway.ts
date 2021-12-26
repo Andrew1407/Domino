@@ -55,8 +55,13 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
         const notifyData: PlayerRes = await this.sessionHandler.removePlayer(sid, disconnected.name);
         const removeIdx: number = this.sessions[sid].indexOf(disconnected);
         this.sessions[sid].splice(removeIdx, 1);
-        for (const { socket } of this.sessions[sid])
-          socket.send(this.responseWrapperStr(notifyData, 'leaveSession'));
+        if (!this.sessions[sid].length) {
+          await this.sessionHandler.removeSession(sid);
+          delete this.sessions[sid];
+        } else {
+          for (const { socket } of this.sessions[sid])
+            socket.send(this.responseWrapperStr(notifyData, 'leaveSession'));
+        }
       } else {
         const disconnectedData: NameContainerRes = { name: disconnected.name };
         for (const { socket, name } of this.sessions[sid]) {

@@ -173,7 +173,7 @@ describe('game session service class', (): void => {
         const expected: Partial<DecksInfoRes> =
           { score, players, stock, round: 1 };
         const roundStartRes: DecksInfoRes[] = await gameSession.roundSetup(id);
-        const expectedTilesCount: number[] = new Array(players - 1).fill(deckSize);
+        const expectedTilesCount: number[] = new Array(players ).fill(deckSize);
         const expectedScores: number[] = new Array(players).fill(0);
         expect(roundStartRes).toHaveLength(players);
         for (const result of roundStartRes) {
@@ -221,8 +221,7 @@ describe('game session service class', (): void => {
           expect(result).toMatchObject(expected);
           const tilesCountNames: PlayerName[] =
             Object.keys(result.tilesCount) as PlayerName[];
-          expect(tilesCountNames).toHaveLength(players - 1);
-          expect(tilesCountNames).not.toContain(result.name);
+          expect(tilesCountNames).toHaveLength(players);
           if (result.name === firstPlayer) {
             const expectedLen: number = playersTiles[firstPlayer].length - 1;
             expect(result.deck).toHaveLength(expectedLen);
@@ -379,7 +378,7 @@ describe('game session service class', (): void => {
         expect(firstMoveRes).toHaveLength(players);
         for (const result of firstMoveRes) {
           expect(result).toMatchObject(expected);
-          expect(Object.keys(result.tilesCount)).toHaveLength(players - 1);
+          expect(Object.keys(result.tilesCount)).toHaveLength(players);
           if (result.name === currentPlayer) {
             const expectedLen: number = playersTiles[currentPlayer].length - 1;
             expect(result.deck).toHaveLength(expectedLen);

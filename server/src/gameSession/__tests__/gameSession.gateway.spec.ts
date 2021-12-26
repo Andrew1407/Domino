@@ -97,10 +97,10 @@ describe('game session gateway', (): void => {
       const name: PlayerName = 'Bobo';
       sessions[id] = [{ name, socket: null }];
       await gateway.handleDisconnect(null);
-      expect(gameSessionServiceStub.removeSession).toBeCalledTimes(0);
+      expect(gameSessionServiceStub.removeSession).toBeCalledTimes(1);
       expect(gameSessionServiceStub.removePlayer).toBeCalledTimes(1);
       expect(gameSessionServiceStub.removePlayer).toBeCalledWith(id, name);
-      expect(sessions[id]).toHaveLength(0);
+      expect(sessions).not.toHaveProperty(id);
     });
   });
 

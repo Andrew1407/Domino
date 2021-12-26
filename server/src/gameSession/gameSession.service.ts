@@ -280,7 +280,6 @@ export default class GameSessionService {
     const playersData: DecksInfoRes[] = [];
     for (const player in decks) {
       const tilesCount: PlayersScore = Object.entries(decks)
-        .filter(([p]: [PlayerName, TilesDeck]): boolean => p !== player)
         .reduce((
             acc: PlayersScore,
             [p, s]: [PlayerName, TilesDeck]

@@ -1,0 +1,62 @@
+.panelsContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.playersInfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border-bottom: black solid 4px;
+
+  input {
+    align-self: center;
+    font-size: 130%;
+  }
+
+  p {
+    // border-right: black solid 4px;
+    font-size: 150%;
+  }
+}
+
+.tilesDecks {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    padding: 1%;
+    height: 400px;
+    width: 90%;
+    p {
+      text-align: center;
+      font-size: 120%;
+    }
+    div {
+      display: flex;
+      flex-direction: column;
+      border: black solid 4px;
+      padding: 1%;
+      overflow-y: scroll;
+
+      p {
+        font-size: 120%;
+        text-align: center;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.journal {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  overflow-y: scroll;
+  padding-left: 5%;
+  font-size: 120%;
+}
