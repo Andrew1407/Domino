@@ -1,7 +1,7 @@
 {
   "name": "server",
-  "version": "0.2.1",
-  "description": "",
+  "version": "0.3.0",
+  "description": "domino game for 2-4 players running on websocket API",
   "main": "index.ts",
   "scripts": {
     "test": "jest",

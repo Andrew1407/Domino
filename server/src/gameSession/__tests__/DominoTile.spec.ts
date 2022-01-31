@@ -108,5 +108,14 @@ describe('copyReversed', (): void => {
       expect(reversed).not.toBe(tile);
     }
   );
+
+  describe('stringify', (): void => {
+    it.each([
+      [new DominoTile(3, 6), '{"left":3,"right":6}'],
+      [DominoTile.of(2, 2), '{"left":2,"right":2}'],
+    ])('should convert tiles to string', (tile: DominoTile, expected: string) => {
+      expect(tile.stringify()).toEqual(expected);
+    })
+  });
 });
 

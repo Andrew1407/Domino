@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers/promises';
 import { BeforeApplicationShutdown } from '@nestjs/common';
-import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { WebSocket } from 'ws';
 import * as dotenv from 'dotenv';
 import GameSessionService from './gameSession.service';
@@ -11,24 +11,24 @@ import ErrorStatus from './wsTools/ErrorStatus';
 import DominoTile, { EndValue } from './entities/DominoTile';
 import { MoveOption } from './playMode/PlayMode';
 import MoveState from './playMode/MoveState';
+import gatewayShutdown from './wsTools/gatewayShutdown';
 
 interface SessionPlayer {
   name: PlayerName,
   socket: WebSocket
 }
 
-type GameSessions = { [session: string]: SessionPlayer[] };
+type GameSessions = Record<string, SessionPlayer[]>;
 type GameSessionResP<T> = Promise<GameSessionRes<T>>;
 type TileData = { left: string, right: string };
 
 dotenv.config();
 
 const WS_PORT: number = parseInt(process.env.WS_PORT, 10) || 8081;
-const WS_ROUTE: string = process.env.WS_ROUTE || '/domino-session';
 
-@WebSocketGateway(WS_PORT, { path: WS_ROUTE })
+@WebSocketGateway(WS_PORT, { path: '/domino-session' })
 export default class GameSessionGateway implements BeforeApplicationShutdown, OnGatewayDisconnect {
-  private sessions: GameSessions = {};
+  private readonly sessions: GameSessions = {};
 
   constructor(public readonly sessionHandler: GameSessionService) {}
 
@@ -39,9 +39,18 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
   }
 
   public async beforeApplicationShutdown(): Promise<void> {
-    await Promise.all(Object.keys(this.sessions)
-      .map((s: string): Promise<void> => this.sessionHandler.removeSession(s))
-    );
+    const disconnectionError: GameSessionError = GameSessionError.serverClosed();
+    const stringifiedData: string = JSON.stringify(disconnectionError.info());
+    const onSessionClose = async (id: string): Promise<void> => {
+      for (const { socket } of this.sessions[id] ?? []) {
+        socket.send(stringifiedData);
+        socket.close();
+      }
+      await this.removeSession(id);
+    };
+
+    await Promise.all(Object.keys(this.sessions).map(onSessionClose))
+      .catch(gatewayShutdown);
   }
 
   public async handleDisconnect(client: WebSocket): Promise<void> {
@@ -50,27 +59,29 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
       const disconnected: SessionPlayer = players
         .find((p: SessionPlayer): boolean => p.socket === client);
       if (!disconnected) continue;
-      const awaitStart: boolean = await this.sessionHandler.shouldWaitForPlayers(sid);
+      const awaitStart: boolean | undefined = await this.sessionHandler.shouldWaitForPlayers(sid)
+        .catch((e: Error): undefined | never => {
+          gatewayShutdown(e);
+          return undefined;
+        });
+      if (awaitStart === undefined) return;
       if (awaitStart) {
         const notifyData: PlayerRes = await this.sessionHandler.removePlayer(sid, disconnected.name);
         const removeIdx: number = this.sessions[sid].indexOf(disconnected);
         this.sessions[sid].splice(removeIdx, 1);
-        if (!this.sessions[sid].length) {
-          await this.sessionHandler.removeSession(sid);
-          delete this.sessions[sid];
-        } else {
-          for (const { socket } of this.sessions[sid])
+        if (!this.sessions[sid].length)
+          await this.removeSession(sid);
+        else
+          for (const { socket } of this.sessions[sid] ?? [])
             socket.send(this.responseWrapperStr(notifyData, 'leaveSession'));
-        }
       } else {
         const disconnectedData: NameContainerRes = { name: disconnected.name };
-        for (const { socket, name } of this.sessions[sid]) {
+        for (const { socket, name } of this.sessions[sid] ?? []) {
           if (disconnected.name === name) continue;
           socket.send(this.responseWrapperStr(disconnectedData, 'interruptedSession'));
           socket.close();
         }
-        await this.sessionHandler.removeSession(sid);
-        delete this.sessions[sid];
+        await this.removeSession(sid);
       }
       return;      
     }
@@ -88,11 +99,11 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
       .some((c: SessionPlayer): boolean => c.socket === client);
     if (clientReserved) throw GameSessionError.forbidden();
     const joinedInfo: PlayerRes = await this.sessionHandler.joinSession(session);
-    for (const { socket } of this.sessions[session])
+    for (const { socket } of this.sessions[session] ?? [])
       socket.send(this.responseWrapperStr(joinedInfo, 'sessionNewcomer'));
     this.sessions[session].push({ name: joinedInfo.name, socket: client });
     const shouldWait: boolean = await this.sessionHandler.shouldWaitForPlayers(session);
-    if (!shouldWait) this.startNewRound(session);
+    if (!shouldWait) this.startNewRound(session).catch(gatewayShutdown);
     return this.responseWrapper(joinedInfo, 'joinSession');
   }
 
@@ -172,13 +183,12 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     await setTimeout(delay);
     const roundRes: RoundRes = await this.sessionHandler.endRound(session);
     roundRes.deadEnd = deadEnd;
-    for (const { socket } of this.sessions[session]) {
+    for (const { socket } of this.sessions[session] ?? []) {
       socket.send(this.responseWrapperStr(roundRes, 'endRound'));
       if (roundRes.endGame) socket.close();
     }
-    if (!roundRes.endGame) return this.startNewRound(session);
-    await this.sessionHandler.removeSession(session);
-    delete this.sessions[session];
+    if (roundRes.endGame) return this.removeSession(session);
+    await this.startNewRound(session);
   }
 
   private parseTileData(tile: TileData): DominoTile {
@@ -215,7 +225,7 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     const nextPlayer: PlayerName = await this.sessionHandler.setNextPlayer(session);
     const nextMoveInfo: NextMoveRes = { name: nextPlayer };
     if (previous) nextMoveInfo.skippedBy = previous;
-    for (const { socket } of this.sessions[session])
+    for (const { socket } of this.sessions[session] ?? [])
       socket.send(this.responseWrapperStr(nextMoveInfo, 'nextMove'));
     this.handleMoveState(session, nextPlayer);
   }
@@ -224,8 +234,7 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     session: string,
     player: PlayerName
   ): Promise<void> {
-    const moveState: MoveState =
-      await this.sessionHandler.ableToPlay(session, player);
+    const moveState: MoveState = await this.sessionHandler.ableToPlay(session, player);
     if (moveState === MoveState.SKIPPABLE)
       this.nextPlayerMove(session, player);
     else if (moveState === MoveState.DEAD_END)
@@ -237,7 +246,7 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     dataArr: T[],
     event: string
   ): void {
-    for (const { name, socket } of this.sessions[session]) {
+    for (const { name, socket } of this.sessions[session] ?? []) {
       const data: T = dataArr.find((d: T): boolean => d.name === name);
       socket.send(this.responseWrapperStr(data, event));
     }
@@ -249,5 +258,10 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
 
   private responseWrapperStr<T>(data: T, event: string): string {
     return JSON.stringify(this.responseWrapper(data, event));
+  }
+
+  private async removeSession(session: string): Promise<void> {
+    await this.sessionHandler.removeSession(session);
+    delete this.sessions[session];
   }
 }

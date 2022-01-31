@@ -10,6 +10,11 @@ export type SessionData = {
   current_move?: PlayerName
 };
 
+export type TileOptions = {
+  side: MoveOption,
+  reversed: boolean,
+};
+
 export default interface StorageClient {
   createSession(sessionId: string, score: number, players: number): Promise<void>;
 
@@ -35,8 +40,7 @@ export default interface StorageClient {
     sessionId: string,
     player: PlayerName,
     tile: DominoTile,
-    side: MoveOption,
-    reversed: boolean
+    tileOptions: TileOptions
   ): Promise<void>;
 
   getDeckEnds(sessionId: string): Promise<TilesDeck>;

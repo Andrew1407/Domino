@@ -5,7 +5,7 @@ import { PlayerName } from '../entities/Player';
 import { MoveOption, PlayersDecks } from '../playMode/PlayMode';
 import { PlayersScore } from '../playMode/ScoreKeeper';
 import { REDIS_CLIENT } from './storage.options';
-import StorageClient, { SessionData } from './StorageClient';
+import StorageClient, { SessionData, TileOptions } from './StorageClient';
 
 @Injectable()
 export default class StorageService implements OnApplicationShutdown, StorageClient {
@@ -98,17 +98,15 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
     sessionId: string,
     player: PlayerName,
     tile: DominoTile,
-    side: MoveOption,
-    reversed: boolean
+    { side, reversed }: TileOptions
   ): Promise<void> {
     const playerDeckField: string = this.prefixedNamespace('player_deck', sessionId, player);
     const commonDeckField: string = this.prefixedNamespace('deck', sessionId);
-    const stringified: string = JSON.stringify(tile);
+    const stringified: string = tile.stringify();
     const removed: number = await this.dbClient.SREM(playerDeckField, stringified);
     if (removed !== 1) throw new Error('invalid deck entries');
     const command: string = side === 'left' ? 'LPUSH' : 'RPUSH';
-    const tileToPush: string = reversed ?
-      JSON.stringify(tile.copyReversed()) : stringified;
+    const tileToPush: string = reversed ? tile.copyReversed().stringify() : stringified;
     await this.dbClient[command](commonDeckField, tileToPush);
   }
 
@@ -173,11 +171,8 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
   public async removeSession(sessionId: string): Promise<void> {
     const sessionField: string = this.prefixedNamespace('sessions', sessionId);
     const playersScoreField: string = this.prefixedNamespace('players_score', sessionId);
-    await Promise.all([
-      this.dbClient.DEL(sessionField),
-      this.dbClient.DEL(playersScoreField),
-      this.clearSessionData(sessionId),
-    ]);
+    await this.clearSessionData(sessionId);
+    await this.dbClient.DEL([sessionField, playersScoreField]);
   }
 
   public async playerDeckEmpty(
@@ -229,7 +224,7 @@ export default class StorageService implements OnApplicationShutdown, StorageCli
   }
 
   private stringifyTiles(tiles: TilesDeck): string[] {
-    return tiles.map((t: DominoTile): string => JSON.stringify(t));
+    return tiles.map((t: DominoTile): string => t.stringify());
   }
 
   private prefixedNamespace(...args: string[]): string {

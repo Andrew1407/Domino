@@ -1,4 +1,6 @@
+import { setTimeout } from 'timers';
 import ErrorStatus from './ErrorStatus';
+import gatewayShutdown from './gatewayShutdown';
 import GameSessionRes from './responseTypes';
 
 export default class GameSessionError extends Error {
@@ -51,6 +53,13 @@ export default class GameSessionError extends Error {
     );
   }
 
+  public static serverClosed(): GameSessionError {
+    return new GameSessionError(
+      'The server connection has been closed',
+      ErrorStatus.SERVER_CLOSED
+    );
+  }
+
   public static catchHandler(): (...args: unknown[]) => PropertyDescriptor {
     return function(
       target: any,
@@ -64,6 +73,7 @@ export default class GameSessionError extends Error {
           return resArgs;
         } catch(e) {
           if (e instanceof GameSessionError) return e.info();
+          setTimeout(gatewayShutdown, 1000, e);
           return GameSessionError.internal().info();
         }
       };
@@ -72,8 +82,8 @@ export default class GameSessionError extends Error {
     };
   }
       
-      constructor(message: string, private readonly status: ErrorStatus) {
-        super(message);
+  constructor(message: string, private readonly status: ErrorStatus) {
+    super(message);
   }
 
   public info(): GameSessionRes<string> {

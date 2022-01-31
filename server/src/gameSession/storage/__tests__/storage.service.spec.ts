@@ -280,9 +280,7 @@ describe('storage service (StorageClient interface)', (): void => {
       const deck: TilesDeck = [DominoTile.of(1, 1), DominoTile.of(5, 4)];
       await storageClient.setStock(sessionId, deck);
       const result: string[] = redisMock.fakeStorage['domino:stock:' + sessionId] as string[];
-      const expected: string[] = deck.map(
-        (t: DominoTile): string => JSON.stringify(t)
-      );
+      const expected: string[] = deck.map((t: DominoTile): string => t.stringify());
       expect(result).toStrictEqual(expected);
     });
   });
@@ -291,14 +289,14 @@ describe('storage service (StorageClient interface)', (): void => {
     it('should give one random tile', async (): Promise<void> => {
       const field: string = 'domino:stock:' + sessionId;
       redisMock.fakeStorage[field] = [
-        JSON.stringify(DominoTile.of(1, 1)),
-        JSON.stringify(DominoTile.of(5, 4)),
-        JSON.stringify(DominoTile.of(6, 1)),
+        DominoTile.of(1, 1).stringify(),
+        DominoTile.of(5, 4).stringify(),
+        DominoTile.of(6, 1).stringify(),
       ];
       const expectedLength: number = (redisMock.fakeStorage[field] as string[]).length - 1;
       const got: DominoTile = await storageClient.getFromStock(sessionId);
       const modifiedDeck: string[] = redisMock.fakeStorage[field] as string[];
-      const toBeRemoved: string = JSON.stringify(got);
+      const toBeRemoved: string = got.stringify();
       expect(modifiedDeck).toHaveLength(expectedLength);
       expect(modifiedDeck).not.toContain(toBeRemoved);
     });
@@ -316,9 +314,9 @@ describe('storage service (StorageClient interface)', (): void => {
     it('should return stock size', async () => {
       const field: string = 'domino:stock:' + sessionId;
       redisMock.fakeStorage[field] = [
-        JSON.stringify(DominoTile.of(1, 1)),
-        JSON.stringify(DominoTile.of(5, 4)),
-        JSON.stringify(DominoTile.of(6, 1)),
+        DominoTile.of(1, 1).stringify(),
+        DominoTile.of(5, 4).stringify(),
+        DominoTile.of(6, 1).stringify(),
       ];
       const expected: number = (redisMock.fakeStorage[field] as string[]).length;
       const result: number = await storageClient.getStockSize(sessionId);
@@ -334,16 +332,19 @@ describe('storage service (StorageClient interface)', (): void => {
         const toBeRemoved: DominoTile = DominoTile.of(5, 4);
         const playerDeckPath: string = `domino:player_deck:${sessionId}:${player}`;
         redisMock.fakeStorage[playerDeckPath] = [
-          JSON.stringify(DominoTile.of(1, 1)),
-          JSON.stringify(toBeRemoved),
-          JSON.stringify(DominoTile.of(6, 1)),
+          DominoTile.of(1, 1).stringify(),
+          toBeRemoved.stringify(),
+          DominoTile.of(6, 1).stringify(),
         ];
         const expectedLength: number = 
           (redisMock.fakeStorage[playerDeckPath] as string[]).length - 1;
-        await storageClient.setMoveAction(sessionId, player, toBeRemoved, 'left', false);
+        await storageClient.setMoveAction(sessionId, player, toBeRemoved, {
+          side: 'left',
+          reversed: false,
+        });
         const modifiedDeck: string[] = redisMock.fakeStorage[playerDeckPath] as string[];
         expect(modifiedDeck).toHaveLength(expectedLength);
-        expect(modifiedDeck).not.toContain(JSON.stringify(toBeRemoved));
+        expect(modifiedDeck).not.toContain(toBeRemoved.stringify());
       }
     );
 
@@ -355,20 +356,21 @@ describe('storage service (StorageClient interface)', (): void => {
         const playerDeckPath: string = `domino:player_deck:${sessionId}:${player}`;
         const commonDeckPath: string = 'domino:deck:' + sessionId;
         redisMock.fakeStorage[playerDeckPath] = [
-          JSON.stringify(DominoTile.of(1, 1)),
-          JSON.stringify(toBeAdded),
-          JSON.stringify(DominoTile.of(6, 1)),
+          DominoTile.of(1, 1).stringify(),
+          toBeAdded.stringify(),
+          DominoTile.of(6, 1).stringify(),
         ];
-        redisMock.fakeStorage[commonDeckPath] = [
-          JSON.stringify(DominoTile.of(0, 0)),
-        ];
+        redisMock.fakeStorage[commonDeckPath] = [DominoTile.of(0, 0).stringify()];
         const expectedLength: number =
           (redisMock.fakeStorage[commonDeckPath] as string[]).length + 1;
         const expectedIndex: number = side === 'left' ? 0 : expectedLength - 1;
-        await storageClient.setMoveAction(sessionId, player, toBeAdded, side, false);
+        await storageClient.setMoveAction(sessionId, player, toBeAdded, {
+          side,
+          reversed: false,
+        });
         const modifiedDeck: string[] = redisMock.fakeStorage[commonDeckPath] as string[];
         expect(modifiedDeck).toHaveLength(expectedLength);
-        expect(modifiedDeck.indexOf(JSON.stringify(toBeAdded)))
+        expect(modifiedDeck.indexOf(toBeAdded.stringify()))
           .toEqual(expectedIndex);
       }
     );
@@ -381,29 +383,30 @@ describe('storage service (StorageClient interface)', (): void => {
         const playerDeckPath: string = `domino:player_deck:${sessionId}:${player}`;
         const commonDeckPath: string = 'domino:deck:' + sessionId;
         redisMock.fakeStorage[playerDeckPath] = [
-          JSON.stringify(DominoTile.of(1, 1)),
-          JSON.stringify(toBeAdded),
-          JSON.stringify(DominoTile.of(6, 1)),
+          DominoTile.of(1, 1).stringify(),
+          toBeAdded.stringify(),
+          DominoTile.of(6, 1).stringify(),
         ];
-        redisMock.fakeStorage[commonDeckPath] = [
-          JSON.stringify(DominoTile.of(0, 0)),
-        ];
+        redisMock.fakeStorage[commonDeckPath] = [DominoTile.of(0, 0).stringify()];
         const expectedLength: number =
           (redisMock.fakeStorage[commonDeckPath] as string[]).length + 1;
         const expectedIndex: number = side === 'left' ? 0 : expectedLength - 1;
-        await storageClient.setMoveAction(sessionId, player, toBeAdded, side, true);
+        await storageClient.setMoveAction(sessionId, player, toBeAdded, {
+          side,
+          reversed: true,
+        });
         const modifiedDeck: string[] = redisMock.fakeStorage[commonDeckPath] as string[];
         expect(modifiedDeck).toHaveLength(expectedLength);
-        expect(modifiedDeck.indexOf(JSON.stringify(toBeAdded.copyReversed())))
+        expect(modifiedDeck.indexOf(toBeAdded.copyReversed().stringify()))
           .toEqual(expectedIndex);
       }
     );
 
     it.each([
       [[], 'is empty'],
-      [[JSON.stringify(DominoTile.of(1, 1))], 'doesn\'t contain the tile'],
+      [[DominoTile.of(1, 1).stringify()], 'doesn\'t contain the tile'],
       [
-        [JSON.stringify(DominoTile.of(0, 1)), JSON.stringify(DominoTile.of(0, 1))],
+        [DominoTile.of(0, 1).stringify(), DominoTile.of(0, 1).stringify()],
         'contains duplicate tiles'
       ]
     ])(
@@ -413,8 +416,10 @@ describe('storage service (StorageClient interface)', (): void => {
         const tile: DominoTile = DominoTile.of(0, 1);
         const playerDeckPath: string = `domino:player_deck:${sessionId}:${player}`;
         redisMock.fakeStorage[playerDeckPath] = deck;
-        await expect(storageClient.setMoveAction(sessionId, player, tile, 'left', false))
-          .rejects.toEqual(new Error('invalid deck entries'));
+        await expect(storageClient.setMoveAction(sessionId, player, tile, {
+          side: 'left',
+          reversed: false,
+        })).rejects.toEqual(new Error('invalid deck entries'));
       }
     );
   });
@@ -425,9 +430,9 @@ describe('storage service (StorageClient interface)', (): void => {
       const expectedRight: DominoTile = DominoTile.of(3, 5);
       const expectedLeft: DominoTile = DominoTile.of(6, 6);
       redisMock.fakeStorage[commonDeckPath] = [
-        JSON.stringify(expectedLeft),
-        JSON.stringify(DominoTile.of(0, 1)),
-        JSON.stringify(expectedRight)
+        expectedLeft.stringify(),
+        DominoTile.of(0, 1).stringify(),
+        expectedRight.stringify(),
       ];
       const result: TilesDeck = await storageClient.getDeckEnds(sessionId);
       const [ gotLeft, gotRight ]: TilesDeck = result;
@@ -442,7 +447,7 @@ describe('storage service (StorageClient interface)', (): void => {
       async (): Promise<void> => {
         const commonDeckPath: string = 'domino:deck:' + sessionId;
         const expected: DominoTile = DominoTile.of(3, 5);
-        redisMock.fakeStorage[commonDeckPath] = [JSON.stringify(expected)];
+        redisMock.fakeStorage[commonDeckPath] = [expected.stringify()];
         const result: TilesDeck = await storageClient.getDeckEnds(sessionId);
         const [ gotLeft, gotRight ]: TilesDeck = result;
         const expectedLength: number = 2;
@@ -502,8 +507,7 @@ describe('storage service (StorageClient interface)', (): void => {
       const playerScorePath: string = `domino:players_score:${sessionId}:`;
       const playerDecksPath: string = `domino:player_deck:${sessionId}:`;
       for (const player in tiles) {
-        const stringified: string[] = tiles[player]
-          .map((t: DominoTile): string => JSON.stringify(t));;
+        const stringified: string[] = tiles[player].map((t: DominoTile): string => t.stringify());
         redisMock.fakeStorage[playerDecksPath + player] = stringified;
         redisMock.fakeStorage[playerScorePath + player] = scores[player].toString();
       }
@@ -560,8 +564,7 @@ describe('storage service (StorageClient interface)', (): void => {
       const testData: TilesDeck = [DominoTile.of(4, 1), DominoTile.of(2, 5)];
       const player: PlayerName = 'Mavun';
       await storageClient.setPlayerDeck(sessionId, player, testData);
-      const expected: string[] = testData
-        .map((t: DominoTile): string => JSON.stringify(t));
+      const expected: string[] = testData.map((t: DominoTile): string => t.stringify());
       const playerDeckPath: string = `domino:player_deck:${sessionId}:${player}`;
       const result: string[] = redisMock.fakeStorage[playerDeckPath] as string[];
       expect(result).toStrictEqual(expected);
@@ -571,8 +574,8 @@ describe('storage service (StorageClient interface)', (): void => {
   describe('playerDeckEmpty', (): void => {
     it('should be falsy if the deck has tile(s)', async (): Promise<void> => {
       const testData: string[] = [
-        JSON.stringify(DominoTile.of(4, 1)),
-        JSON.stringify(DominoTile.of(2, 5)),
+        DominoTile.of(4, 1).stringify(),
+        DominoTile.of(2, 5).stringify(),
       ];
       const player: PlayerName = 'Mavun';
       const playerDeckPath: string = `domino:player_deck:${sessionId}:${player}`;
@@ -605,8 +608,7 @@ describe('storage service (StorageClient interface)', (): void => {
         DominoTile.of(5, 5),
         DominoTile.of(1, 2),
       ];
-      redisMock.fakeStorage[deckPath] = testData
-        .map((t: DominoTile): string => JSON.stringify(t));
+      redisMock.fakeStorage[deckPath] = testData.map((t: DominoTile): string => t.stringify());
       const result: TilesDeck = await storageClient.getCommonDeck(sessionId);
       expect(result).toStrictEqual(testData);
     });

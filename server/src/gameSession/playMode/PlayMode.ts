@@ -2,7 +2,7 @@ import DominoTile, { TilesDeck } from '../entities/DominoTile';
 import { PlayerName } from '../entities/Player';
 import MoveState from './MoveState';
 
-export type PlayersDecks = Partial<{ [key in PlayerName]: TilesDeck; }>;
+export type PlayersDecks = Partial<Record<PlayerName, TilesDeck>>;
 export type MoveOption = 'left' | 'right';
 
 export default interface PlayMode {

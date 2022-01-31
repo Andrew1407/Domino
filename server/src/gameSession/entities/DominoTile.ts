@@ -26,4 +26,8 @@ export default class DominoTile {
   public copyReversed(): DominoTile {
     return new DominoTile(this.right, this.left);
   }
+
+  public stringify(): string {
+    return JSON.stringify(this);
+  }
 }

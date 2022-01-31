@@ -295,7 +295,10 @@ describe('game session service class', (): void => {
         const tileA: DominoTile = DominoTile.of(2, 4);
         const tileB: DominoTile = DominoTile.of(4, 4);
         await storageClient.setPlayerDeck(id, name, [tileA, tileB]);
-        await storageClient.setMoveAction(id, name, tileA, 'left', false);
+        await storageClient.setMoveAction(id, name, tileA, {
+          side: 'left',
+          reversed: false,
+        });
         const result: boolean =
           await gameSession.ableToMove(id, name, tileB, 'right');
         expect(result).toBeTruthy();
@@ -310,7 +313,10 @@ describe('game session service class', (): void => {
         const tileA: DominoTile = DominoTile.of(2, 4);
         const tileB: DominoTile = DominoTile.of(4, 4);
         await storageClient.setPlayerDeck(id, name, [tileA, tileB]);
-        await storageClient.setMoveAction(id, name, tileA, 'left', false);
+        await storageClient.setMoveAction(id, name, tileA, {
+          side: 'left',
+          reversed: false,
+        });
         const result: boolean =
           await gameSession.ableToMove(id, name, tileB, 'left');
         expect(result).toBeFalsy();
@@ -362,7 +368,10 @@ describe('game session service class', (): void => {
           await storageClient.setPlayerScore(id, player as PlayerName, 0);
           await storageClient.setPlayerDeck(id, player as PlayerName, tiles);
         }
-        await storageClient.setMoveAction(id, 'Mavun', tileA, 'left', false);
+        await storageClient.setMoveAction(id, 'Mavun', tileA, {
+          side: 'left',
+          reversed: false,
+        });
         await storageClient.setCurrentMove(id, currentPlayer);
         const expected: Partial<MoveRes> = {
           players,
@@ -407,7 +416,10 @@ describe('game session service class', (): void => {
           await storageClient.setPlayerScore(id, player as PlayerName, 0);
           await storageClient.setPlayerDeck(id, player as PlayerName, tiles);
         }
-        await storageClient.setMoveAction(id, 'Mavun', tileA, 'left', false);
+        await storageClient.setMoveAction(id, 'Mavun', tileA, {
+          side: 'left',
+          reversed: false,
+        });
         await storageClient.setCurrentMove(id, currentPlayer);
         const firstMoveRes: MoveRes[] =
           await gameSession.moveAction(id, currentPlayer, tileB, 'right');
@@ -451,7 +463,10 @@ describe('game session service class', (): void => {
         const tileA: DominoTile = DominoTile.of(2, 4);
         const tileB: DominoTile = DominoTile.of(1, 0);
         await storageClient.setPlayerDeck(id, name, [tileA, tileB]);
-        await storageClient.setMoveAction(id, name, tileA, 'left', false);
+        await storageClient.setMoveAction(id, name, tileA, {
+          side: 'left',
+          reversed: false,
+        });
         await expect(gameSession.moveAction(id, name, tileB, 'left'))
           .rejects.toEqual(GameSessionError.badRequest());
       }

@@ -73,7 +73,10 @@ export default class GameSessionService {
       this.playMode.pickFirstMove(playersDecks);
     await Promise.all([
       this.storage.setCurrentMove(sessionId, firstPlayer),
-      this.storage.setMoveAction(sessionId, firstPlayer, firstTile, 'right', false),
+      this.storage.setMoveAction(sessionId, firstPlayer, firstTile, {
+        reversed: false,
+        side: 'right',
+      }),
     ]);
     return this.formatResponseMove(
       sessionId,
@@ -116,7 +119,7 @@ export default class GameSessionService {
     const reversed: boolean = side === 'left' ?
       comparable.left !== tile.right :
       comparable.right !== tile.left;
-    await this.storage.setMoveAction(sessionId, player, tile, side, reversed);
+    await this.storage.setMoveAction(sessionId, player, tile, { side, reversed });
     return this.formatResponseMove(
       sessionId,
       player,
