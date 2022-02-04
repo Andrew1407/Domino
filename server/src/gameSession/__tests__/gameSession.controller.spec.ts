@@ -4,7 +4,7 @@ import GameSessionController from '../gameSession.controller';
 import GameSessionGateway from '../gameSession.gateway';
 import GameSessionError from '../wsTools/GameSessionError';
 
-const gatewayStub: { [method: string]: jest.Mock } = {
+const gatewayStub: Record<string, jest.Mock> = {
   newSession: jest.fn((): string => 'session-test-id'),
 };
 

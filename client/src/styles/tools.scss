@@ -1,0 +1,23 @@
+$green-theme: rgb(127, 194, 73);
+$green-light-theme: rgb(136, 180, 100);
+
+$cream-theme: #fffdd0;
+$cream-dark-theme: #cca85c;
+
+$brown-theme: rgb(155, 72, 5);
+
+
+@mixin flex-display($params...) {
+  display: flex;
+  flex-direction: nth($params, 1);
+  justify-content: nth($params, 2);
+}
+
+@mixin block-decoration($params...) {
+  background-color: nth($params, 1);
+  @if nth($params, 2) == all {
+    border: nth($params, 4) solid nth($params, 3);
+  } @else {
+    border-#{nth($params, 2)}: nth($params, 4) solid nth($params, 3);
+  }
+}

@@ -6,7 +6,7 @@ import { PlayerName } from '../../entities/Player';
 import StorageService from '../storage.service';
 import StorageClient, { SessionData } from '../StorageClient';
 
-type FakeStorage = { [key: string]: unknown };
+type FakeStorage = Record<string, unknown>;
 
 class RedisClientMock {
   public readonly fakeStorage: FakeStorage = {};

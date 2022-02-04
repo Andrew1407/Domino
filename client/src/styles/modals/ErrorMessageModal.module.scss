@@ -1,0 +1,33 @@
+@import "./modal.scss";
+@import "../tools.scss";
+
+.modalBackground {
+  @include modal-bkg;
+}
+
+.modalComponent {
+  @include modal-size(25%, 30%, 40%, 40%);
+  @include block-decoration($green-light-theme, all, $brown-theme, 6px);
+  @include flex-display(column, space-between);
+  text-align: center;
+  overflow-y: hidden;
+}
+
+.messageTitle {
+  font-size: 220%;
+  margin-bottom: 10%;
+  color: rgb(104, 15, 33);
+}
+
+.messageText {
+  font-size: 140%;
+}
+
+.modalButton {
+  @include block-decoration($cream-theme, all, $cream-dark-theme, 4px);
+  width: 23%;
+  margin: 0 auto 2%;
+  padding: 0.75%;
+  font-size: 140%;
+  font-style: italic;
+}

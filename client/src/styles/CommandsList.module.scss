@@ -1,0 +1,21 @@
+@import "./tools.scss";
+
+.listContainer {
+  @include flex-display(column, none);
+  margin: 0 0 2% 1.5%;
+}
+
+.elementsContainer {
+  @include flex-display(column, none);
+}
+
+.description {
+  margin: 0.5% 0 0.5% 1.5%;
+  b {
+    font-size: 110%;
+  }
+}
+
+.subheader {
+  margin-left: 0.75%;
+}

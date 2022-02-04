@@ -1,0 +1,11 @@
+@import "./tools.scss";
+
+body {
+  background: $cream-theme;
+  margin: 0;
+}
+
+@font-face {
+  font-family: "Ventera";
+  src: url("/fonts/Ventera.ttf");
+}

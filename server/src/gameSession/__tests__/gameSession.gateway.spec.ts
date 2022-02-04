@@ -10,11 +10,11 @@ import GameSessionError from '../wsTools/GameSessionError';
 import GameSessionRes, { MovePermissionRes, PlayerRes } from '../wsTools/responseTypes';
 
 
-const gameSessionServiceStub: { [method: string]: jest.Mock } = {
+const gameSessionServiceStub: Record<string, jest.Mock> = {
   makeNewSession: jest.fn((): string => 'test-session-id'),
   removeSession: jest.fn(),
   removePlayer: jest.fn(),
-  shouldWaitForPlayers: jest.fn((): boolean => true),
+  shouldWaitForPlayers: jest.fn(async (): Promise<boolean> => true),
   shouldMove: jest.fn((): boolean => true),
   joinSession: jest.fn((): object => ({ name: 'Bobo' })),
   ableToMove: jest.fn((): boolean => false),
@@ -38,7 +38,8 @@ describe('game session gateway', (): void => {
   });
 
   afterEach((): void => {
-    gateway['sessions'] = {};
+    for (const sid of Object.keys(gateway['sessions']))
+      delete gateway['sessions'][sid];
     jest.clearAllMocks();
   });
 
@@ -79,7 +80,7 @@ describe('game session gateway', (): void => {
   describe('handleDisconnect', (): void => {
     it('should remove session if shouldWaitForPlayers is false', async (): Promise<void> => {
       gameSessionServiceStub.shouldWaitForPlayers
-        .mockImplementationOnce((): boolean => false);
+        .mockImplementationOnce(async (): Promise<boolean> => false);
       const sessions: { [key: string]: unknown[] } = gateway['sessions'];
       const id: string = 'test-session-id';
       const name: PlayerName = 'Bobo';

@@ -1,0 +1,21 @@
+@mixin modal-bkg {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  margin: 0 auto;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background-color: rgba(31, 32, 41, 0.75);
+  pointer-events: auto;
+}
+
+@mixin modal-size($params...) {
+  position: absolute;
+  top: nth($params, 1);
+  left: nth($params, 2);
+  width: nth($params, 3);
+  height: nth($params, 4);
+}

@@ -1,0 +1,27 @@
+@import "../tools.scss";
+
+.footer {
+  @include flex-display(row, space-between);
+  @include block-decoration($cream-dark-theme, top, $brown-theme, 5px);
+  padding: 0 2%;
+  font-size: 120%;
+  align-items: center;
+}
+
+.refText {
+  color: blueviolet;
+}
+
+.title {
+  font-size: 108%;
+  color: $brown-theme;
+}
+
+.version {
+  color: rgb(5, 95, 5);
+}
+
+.refText:hover {
+  color: crimson;
+  font-size: 110%;
+}

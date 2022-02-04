@@ -1,0 +1,116 @@
+@import "./tools.scss";
+
+$cream-light: #ddc695; 
+$dried-blood: rgb(104, 15, 33);
+
+.optionsContainer {
+  @include block-decoration($cream-dark-theme, all, $brown-theme, 6px);
+  @include flex-display(column, none);
+  margin: 7% auto;
+  width: 50%;
+  height: 60%;
+}
+
+.optionsList {
+  @include block-decoration($cream-dark-theme, bottom, $brown-theme, 4px);
+  @include flex-display(row, none);
+  text-align: center;
+
+  div:not(div:last-child) {
+    border-right: 4px solid $brown-theme;
+  }
+}
+
+.optionBlock {
+  width: 50%;
+  padding: 1.5% 0;
+  font-size: 150%;
+
+  & > * {
+    margin: 0
+  }
+}
+
+.pickedOptionBlock {
+  font-weight: bold;
+  font-size: 165%;
+  color: $dried-blood;
+  background-color: $cream-light;
+}
+
+.joinOptionEntries {
+  @include flex-display(row, center);
+  margin: auto;
+  align-items: center;
+  min-width: 90%;
+
+  label {
+    font-size: 140%;
+    margin-right: 2%;
+    font-style: italic;
+  }
+  
+  input[type=text] {
+    @include block-decoration($cream-light, all, $brown-theme, 3px);
+    width: 65%;
+    padding: 0.75% 0.5%;
+    font-size: 120%;
+    outline: none;
+  }
+}
+
+
+.createOptionEntries {
+  @include flex-display(column, space-evenly);
+  height: 100%;
+  align-items: center;
+}
+
+.playersSelector {
+  @include flex-display(row, center);
+  align-items: center;
+
+  label {
+    margin-right: 10%;
+    font-size: 150%;
+    font-style: italic;
+  }
+
+  select {
+    @include block-decoration($cream-light, all, $brown-theme, 3px);
+    font-size: 110%;
+    outline: none;
+    padding: 1% 15%;
+  }
+}
+
+.scoreContainer {
+  @include flex-display(row, center);
+  align-items: center;
+  min-width: 90%; 
+
+  label {
+    margin-right: 3%;
+    font-size: 150%;
+    font-style: italic;
+  }
+  
+  input[type=number] {
+    @include block-decoration($cream-light, all, $brown-theme, 3px);
+    width: 26%;
+    padding: 0.75% 0.5%;
+    text-align: center;
+    font-size: 120%;
+    outline: none;
+  }
+}
+
+.optionsSubmitBtn {
+  @include block-decoration($cream-light, all, $brown-theme, 3.5px);
+  margin-left: 2%;
+  padding: 0.5% 3.5%;
+  font-weight: bold;
+  font-size: 130%;
+  color: $dried-blood;
+  outline: none;
+}

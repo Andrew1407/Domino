@@ -1,0 +1,17 @@
+@import "../tools.scss";
+
+.header {
+  @include flex-display(row, space-between);
+  @include block-decoration($cream-dark-theme, bottom, $brown-theme, 5px);
+  padding: 0.75%;
+}
+
+.title {
+  font-family: "Ventera";
+  font-size: 170%;
+  margin-left: 1%;
+
+  h1 {
+    margin: 0;
+  }
+}
