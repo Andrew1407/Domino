@@ -1,7 +1,7 @@
+
 export const connectToSession = (id, events) => {
   const socket = new WebSocket(`ws://${process.env.WS_ADDR}/domino-session`);
   socket.onopen = () => {
-    console.log('Connected');
     sendFrom(socket, 'joinSession', { session: id });
   }
 

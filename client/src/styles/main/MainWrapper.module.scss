@@ -5,11 +5,10 @@
 }
 
 .centralBlock {
-  height: 77.8vh;
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  overflow-y: visible;
+  // height: 77.8vh;
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
 }
 

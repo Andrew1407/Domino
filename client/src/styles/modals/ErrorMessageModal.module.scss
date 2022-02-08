@@ -6,7 +6,7 @@
 }
 
 .modalComponent {
-  @include modal-size(25%, 30%, 40%, 40%);
+  @include modal-size(25%, 30%, 40%, 35%);
   @include block-decoration($green-light-theme, all, $brown-theme, 6px);
   @include flex-display(column, space-between);
   text-align: center;

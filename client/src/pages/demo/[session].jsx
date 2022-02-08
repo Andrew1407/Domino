@@ -23,8 +23,9 @@ import { setCurrentMove, setRoundInfo } from '../../storage/actions/roundInfo';
 import { setPickedTile, clearPickedTile } from '../../storage/actions/pickedTile';
 import { setPlayerDeck } from '../../storage/actions/playerDeck';
 import { setCommonDeck } from '../../storage/actions/commonDeck';
-import { addJoinedPlayer, removeJoinedPlayer, setJoinedPlayers, setJoinedPlayersInitial } from '../../storage/actions/joinedPlayers';
+import { addJoinedPlayer, removeJoinedPlayer, setJoinedPlayers } from '../../storage/actions/joinedPlayers';
 import { addToLog } from '../../storage/actions/log';
+import { socketConnection } from '../../api/socketConnection';
 
 export default function GameSession() {
   const router = useRouter();
@@ -40,161 +41,33 @@ export default function GameSession() {
   const roundInfo = useSelector(getRoundInfo);
 
   useEffect(() => {
-    const socket = connectToSession(sessionId, {
-      error(data, status) {
-        console.error({ status, data });
-        alert(JSON.stringify({ status, data }));
-      },
+    const handlers = {
+      setErrorMessage: (...args) => alert(...args),
+      setCurrentPlayer: (...args) => dispatch(setCurrentPlayer(...args)),
+      setRoundInfo: (...args) => dispatch(setRoundInfo(...args)),
+      setJoinedPlayers: (...args) => dispatch(setJoinedPlayers(...args)),
+      removeJoinedPlayer: (...args) => dispatch(removeJoinedPlayer(...args)),
+      addJoinedPlayer: (...args) => dispatch(addJoinedPlayer(...args)),
+      addToLog: (...args) => dispatch(addToLog(...args)),
+      setPlayerDeck: (...args) => dispatch(setPlayerDeck(...args)),
+      setCommonDeck: (...args) => dispatch(setCommonDeck(...args)),
+      setCurrentMove: (...args) => dispatch(setCurrentMove(...args)),
+    };
 
-      joinSession({ name, players, score, scores, round }) {
-        console.log(players);
-        dispatch(setCurrentPlayer(name));
-        dispatch(setRoundInfo({
-          players,
-          finalScore: score,
-          currentRound: round,
-          stock: 0,
-        }));
-        dispatch(setJoinedPlayersInitial(Object.keys(scores)));
-      },
-
-      leaveSession({ name }) {
-        console.log('Left: ', name);
-        dispatch(removeJoinedPlayer(name));
-        dispatch(addToLog(`Player "${name}" has left the current session.`));        
-      },
-
-      sessionNewcomer({ name }) {
-        console.log('Joined: ', name);
-        dispatch(addJoinedPlayer(name));
-        dispatch(addToLog(`Player "${name}" has joined the current session.`));
-      },
-
-      interruptedSession({ name }) {
-        console.log(name, 'interrupted the session game');
-        alert(name + ' interrupted the session game');
-      },
-
-      moveAction({ deck, commonDeck, players, score, scores, tilesCount, current_move, round, stock, tile }) {
-        console.log(current_move, 'made a move');
-        if (deck) dispatch(setPlayerDeck(deck));
-        dispatch(setCommonDeck(commonDeck));
-        dispatch(setRoundInfo({
-          stock,
-          players,
-          finalScore: score,
-          currentRound: round,
-          currentMove: current_move,
-        }));
-        const playersData = Object.keys(tilesCount).map(p => ({
-          name: p, score: scores[p], tiles: tilesCount[p]
-        }));
-        dispatch(setJoinedPlayers(playersData));
-        dispatch(addToLog(`Player "${current_move}" made a move with a tile ${JSON.stringify(tile)}.`));
-      },
-
-      fromStock({ deck, commonDeck, players, score, scores, tilesCount, current_move, round, stock, tile }) {
-        console.log(current_move, 'took a tile from the stock');
-        if (deck) dispatch(setPlayerDeck(deck));
-        if (tile) console.log(tile);
-        dispatch(setCommonDeck(commonDeck));
-        dispatch(setRoundInfo({
-          stock,
-          players,
-          finalScore: score,
-          currentRound: round,
-          currentMove: current_move,
-        }));
-        const playersData = Object.keys(tilesCount).map(p => ({
-          name: p, score: scores[p], tiles: tilesCount[p]
-        }));
-        dispatch(setJoinedPlayers(playersData));
-        dispatch(addToLog(`Player "${current_move}" took a tile from the stock.`));
-      },
-
-      endRound({ scores, winner, endGame }) {
-        if (!winner) {
-          console.log('Draw!');
-          dispatch(addToLog('The round ended with a draw.'));
-        }
-        else {
-          console.log('Round winner:', winner);
-          dispatch(addToLog(`Player ${winner} won the round with the score ${scores[winner]}.`));
-        }
-        if (endGame) {
-          console.log('Game winner:', winner);
-          dispatch(addToLog(`Player ${winner} won the game with the score ${scores[winner]}.`));
-        };
-        console.log(scores);
-      },
-
-      roundStart({ deck, name, players, round, score, scores, stock, tilesCount }) {
-        console.log('Start of a round', round);
-        dispatch(setPlayerDeck(deck));
-        dispatch(setRoundInfo({
-          stock,
-          players,
-          finalScore: score,
-          currentRound: round,
-        }));
-        const playersData = Object.keys(tilesCount).map(p => ({
-          name: p, score: scores[p], tiles: tilesCount[p]
-        }));
-        dispatch(setJoinedPlayers(playersData));
-        dispatch(addToLog(`Round ${round} has started.`));
-      },
-
-      firstMove({ deck, commonDeck, players, score, scores, tilesCount, current_move, round, stock, tile }) {
-        console.log(current_move, 'made a first move');
-        if (deck) dispatch(setPlayerDeck(deck));
-        dispatch(setCommonDeck(commonDeck));
-        dispatch(setRoundInfo({
-          stock,
-          players,
-          finalScore: score,
-          currentRound: round,
-          currentMove: current_move,
-        }));
-        const playersData = Object.keys(tilesCount).map(p => ({
-          name: p, score: scores[p], tiles: tilesCount[p]
-        }));
-        dispatch(setJoinedPlayers(playersData));
-        dispatch(addToLog(`Player "${current_move}" made a first move with a tile ${JSON.stringify(tile)}.`));
-      },
-
-      nextMove({ name, skippedBy }) {
-        console.log(name + '\'s turn to make a move');
-        if (skippedBy) {
-          console.log(skippedBy, 'skips a move');
-          dispatch(addToLog(`Player "${skippedBy}" is unable to make a move and skips it.`));
-        }
-        dispatch(setCurrentMove(name));
-        dispatch(addToLog(`The next move is for player "${name}"`));
-      },
-    });
-
-    setSessionSocket(socket);
-    return () => socket.close();
+    const sessionEmitter = socketConnection(sessionId, handlers);
+    setSessionSocket(sessionEmitter);
   }, []);
 
   const pickTile = tile => () => dispatch(setPickedTile(tile));
   const placeTile = side => () => {
     if (roundInfo.currentMove !== currentPlayer) return;
-    sendFrom(
-      sessionSocket,
-      'moveAction',
-      { side, session: sessionId, tile: pickedTile }
-    )
+    sessionSocket.moveAction(side, pickedTile);
     dispatch(clearPickedTile());
   };
 
   const fromStock = () => {
     if (roundInfo.currentMove !== currentPlayer) return;
-    sendFrom(
-      sessionSocket,
-      'fromStock',
-      { session: sessionId }
-    )
+    sessionSocket.takeFromStock();
   };
 
   return (

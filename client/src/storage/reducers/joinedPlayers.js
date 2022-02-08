@@ -1,5 +1,5 @@
 import { makeReducer } from '../tools/state';
-import { JOINED_PLAYERS_ADD, JOINED_PLAYERS_SET, JOINED_PLAYERS_REMOVE, JOINED_PLAYERS_SET_INITIAL as JOINED_PLAYERS_SET_INITIAL } from '../types';
+import { JOINED_PLAYERS_ADD, JOINED_PLAYERS_SET, JOINED_PLAYERS_REMOVE } from '../types';
 
 const initial = [];
 
@@ -9,9 +9,6 @@ const actions = {
   ],
   [JOINED_PLAYERS_REMOVE]: (state, payload) => state.filter(
     player => player.name !== payload
-  ),
-  [JOINED_PLAYERS_SET_INITIAL]: (_, payload) => payload.map(
-    name => ({ name, tiles: 0, score: 0 })
   ),
   [JOINED_PLAYERS_SET]: (_, payload) => payload,
 };

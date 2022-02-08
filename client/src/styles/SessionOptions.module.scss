@@ -6,9 +6,9 @@ $dried-blood: rgb(104, 15, 33);
 .optionsContainer {
   @include block-decoration($cream-dark-theme, all, $brown-theme, 6px);
   @include flex-display(column, none);
-  margin: 7% auto;
+  margin: 8% auto;
   width: 50%;
-  height: 60%;
+  height: 40vh;
 }
 
 .optionsList {

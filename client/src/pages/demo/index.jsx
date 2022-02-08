@@ -16,9 +16,12 @@ export default function SessionCreator() {
 
   const createNewSession = async () => {
     const { score, players } = sessionParams;
-    const sessionId = await createSession(players, score);
-    if (!sessionId) alert('Invalid params');
-    else router.push('/demo/[session]', '/demo/' + sessionId);
+    try {
+      const sessionId = await createSession(players, score);
+      router.push('/demo/[session]', '/demo/' + sessionId);
+    } catch (e) {
+      alert('Invalid params ' + e.message);
+    }
   };
 
   return (

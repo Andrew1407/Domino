@@ -1,5 +1,10 @@
+import MainWrapper from '../components/main/MainWrapper';
+
 export default function NotFound() {
+  
   return (
-    <h1>Page not found</h1>
+    <MainWrapper>
+      <h1>Page not found</h1>
+    </MainWrapper>
   );
 };
