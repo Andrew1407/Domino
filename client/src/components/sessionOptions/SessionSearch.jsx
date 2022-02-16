@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 import { joinOptionEntries, optionsSubmitBtn } from '../../styles/SessionOptions.module.scss';
 
 export default function SessionSearch() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const sessionInupt = useRef();
   const [ sessionId, setSessionId ] = useState('');
@@ -11,6 +13,7 @@ export default function SessionSearch() {
   const joinSession = useCallback(async e => {
     e.preventDefault();
     if (!sessionId) return;
+    dispatch(setSessionId(sessionId));
     router.push('/game-session/[id]', '/game-session/' + sessionId);
   }, [sessionId]);
 

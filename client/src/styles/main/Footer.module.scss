@@ -3,11 +3,9 @@
 .footer {
   @include flex-display(row, space-around);
   @include block-decoration($cream-dark-theme, top, $brown-theme, 5px);
-  position: fixed;
-  bottom: 0;
-  left: 0;
   width: 100%;
-  max-height: 8%;
+  height: 8%;
+  margin-top: auto;
   font-size: 120%;
   align-items: center;
 }

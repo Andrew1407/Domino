@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { connectToSession, sendFrom } from '../../api/gameSessionSocket';
 import {
   panelsContainer,
   playersInfo,
@@ -27,7 +26,7 @@ import { addJoinedPlayer, removeJoinedPlayer, setJoinedPlayers } from '../../sto
 import { addToLog } from '../../storage/actions/log';
 import { socketConnection } from '../../api/socketConnection';
 
-export default function GameSession() {
+export default function GameSessionPage() {
   const router = useRouter();
   const sessionId = router.query.session;
   const dispatch = useDispatch();
@@ -131,7 +130,7 @@ export default function GameSession() {
   );
 };
 
-GameSession.getInitialProps = async (ctx) => {
+GameSessionPage.getInitialProps = async (ctx) => {
   const { session } = ctx.query;
   return { props: { session } };
 }

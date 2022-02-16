@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className={footer}>
       <p className={version}>
         <small>
-          <b>version: 0.1.0</b>
+          <b>version: 0.2.0</b>
         </small>
       </p>
 

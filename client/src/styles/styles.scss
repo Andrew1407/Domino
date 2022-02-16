@@ -1,8 +1,18 @@
 @import "./tools.scss";
 
+html {
+  height: 100vh;
+}
+
 body {
   background: $cream-theme;
   margin: 0;
+
+  #__next {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 @font-face {

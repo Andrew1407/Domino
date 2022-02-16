@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
 import ErrorMessageModal from '../modals/ErrorMessageModal';
 import { createOptionEntries, playersSelector, scoreContainer, optionsSubmitBtn } from '../../styles/SessionOptions.module.scss';
 import { createSession } from '../../api/sessionsIdentifier';
@@ -9,6 +9,7 @@ const initialScore = 26;
 const availablePlayers = [2, 3, 4];
 
 export default function SessionCreator() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const sessionInupt = useRef();
   const [ errorMessage, setErrorMessage ] = useState('');
@@ -31,6 +32,7 @@ export default function SessionCreator() {
     e.preventDefault();
     try {
       const createdSession = await createSession(players, score);
+      dispatch(setSessionId(createdSession));
       router.push('/game-session/[id]', '/game-session/' + createdSession);
     } catch (e) {
       setErrorMessage(e.message);

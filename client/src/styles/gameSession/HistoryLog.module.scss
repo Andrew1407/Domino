@@ -1,0 +1,44 @@
+@import "../tools.scss";
+
+.logContainer {
+  @include block-decoration(rgb(248, 172, 85), left, $brown-theme, 4px);
+  grid-column: 5 / -1;
+  grid-row: 2 / -1;
+  overflow-y: scroll;
+  padding: 0.5% 2%;
+
+  &::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $brown-theme;
+    height: 5px;
+    border-radius: 10px;
+  }
+}
+
+.logHeader {
+  @include block-decoration(rgb(206, 146, 77), bottom, $brown-theme, 4px);
+  border-left: $brown-theme solid 4px;
+  display: table;
+  grid-column: 5 / -1;
+  grid-row: 1 / 2;
+  text-align: center;
+  font-size: 90%;
+
+  h1 {
+    margin: 0;
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
+
+.logMessage {
+  font-size: 115%;
+  font-style: italic;
+  margin: 0;
+  margin-top: 5%;
+  padding-bottom: 3%;
+  border-bottom: $brown-theme solid 2px;
+}

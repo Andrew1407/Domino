@@ -2,6 +2,7 @@
 
 .mainBlock {
   @include flex-display(column, none);
+  min-height: 100%;
 }
 
 .centralBlock {

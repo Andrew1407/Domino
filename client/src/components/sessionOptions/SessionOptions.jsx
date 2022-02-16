@@ -2,6 +2,7 @@ import { useState } from 'react';
 import SessionCreator from './SessionCreator';
 import SessionSearch from './SessionSearch';
 import { optionsContainer, optionsList, optionBlock, pickedOptionBlock } from '../../styles/SessionOptions.module.scss';
+import { applyStylesIf } from '../../tools';
 
 const options = {
   'create session': SessionCreator,
@@ -18,7 +19,7 @@ export default function SessionOptions() {
         {Object.keys(options).map(op => (
           <div
             key={op}
-            className={op === pickedOption ? `${optionBlock} ${pickedOptionBlock}` : optionBlock}
+            className={applyStylesIf(op === pickedOption, [optionBlock, pickedOptionBlock], [optionBlock])}
             onClick={() => setPickedOption(op)}
           >
             <p>{op}</p>

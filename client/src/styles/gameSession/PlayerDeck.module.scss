@@ -1,0 +1,49 @@
+@import "../tools.scss";
+
+.deckContainer {
+  @include flex-display(row, none);
+  @include block-decoration(rgb(197, 134, 75), top, $brown-theme, 4px);
+  grid-column: 1 / 5;
+  grid-row: 14 / -1;
+}
+
+.stockBtn {
+  @include block-decoration(rgb(221, 153, 90), all, $brown-theme, 2px);
+  font-size: 110%;
+  padding: 1%;
+  outline: none;
+  width: max-content;
+}
+
+.tilesContainer {
+  @include flex-display(row, none);
+  width: 100%;
+  padding: 0 2%;
+  overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $brown-theme;
+    border-radius: 10px;
+  }
+}
+
+.tileContainer {
+  margin: 0.5% 1%;
+  padding: 0.3%;
+}
+
+.tileContainer:hover {
+  padding: 0;
+  margin: 0.5% 1%;
+  box-shadow: 5px 5px 8px black;
+}
+
+.pickedTileContainer {
+  padding: 0;
+  margin: 0.5% 1%;
+  box-shadow: 0px 0px 15px $cream-theme;
+}

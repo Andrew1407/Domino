@@ -2,12 +2,12 @@ import Footer from './Footer';
 import Header from './Header';
 import { centralBlock, mainBlock } from '../../styles/main/MainWrapper.module.scss';
 
-export default function MainWrapper({ headerEntries, children }) {
+export default function MainWrapper({ HeaderInfo, children }) {
   return (
     <div className={mainBlock}>
-      {headerEntries ? 
+      {HeaderInfo ? 
         <Header>
-          <headerEntries />
+          <HeaderInfo />
         </Header> :
         <Header />
       }

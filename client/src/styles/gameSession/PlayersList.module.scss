@@ -1,0 +1,42 @@
+@import "../tools.scss";
+
+.playersListContainer {
+  @include flex-display(row, center);
+  @include block-decoration(rgb(204, 161, 68), bottom, $brown-theme, 4px);
+  grid-column: 1 / 5;
+  grid-row: 1 / 2;
+}
+
+.playerBlock {
+  @include flex-display(row, center);
+  font-size: 180%;
+  width: 50%;
+  align-items: center;
+}
+
+.playerBlock:not(div:first-child) {
+  @include block-decoration(rgb(204, 161, 68), left, $brown-theme, 4px);
+}
+
+.infoEntries {
+  @include flex-display(row, center);
+  align-items: center;
+
+  span {
+    margin-right: 15%;
+  }
+}
+
+.nameInfo {
+  margin-right: 5%;
+}
+
+.separator {
+  margin: 0 3%;
+  font-size: 130%;
+  font-weight: bold;
+}
+
+.setPlayer {
+  font-weight: bold;
+}
