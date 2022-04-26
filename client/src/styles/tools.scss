@@ -21,3 +21,18 @@ $brown-theme: rgb(155, 72, 5);
     border-#{nth($params, 2)}: nth($params, 4) solid nth($params, 3);
   }
 }
+
+@mixin scrollbar($params...) {
+  &::-webkit-scrollbar {
+    @if nth($params, 1) == vertical {
+      width: nth($params, 2);
+    } @else if nth($params, 1) == horizontal {
+      height: nth($params, 2);
+    }
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: nth($params, 3);
+    border-radius: nth($params, 4);
+  }  
+}

@@ -1,5 +1,33 @@
+@import "../tools.scss";
+
 .boardContainer {
   background-color: #ddc695;
   grid-column: 1 / 5;
   grid-row: 2 / 14;
+}
+
+.loadingScreen {
+  @include flex-display(column, none);
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+  padding-top: 8%;
+}
+
+.laodingTitle {
+  font-size: 340%;
+}
+
+.tilesLoadContaner {
+  width: 100%;
+}
+
+.loadingTile {
+  padding: 0.5%;
+}
+
+.tilesTable {
+  width: 100%;
+  height: 100%;
 }

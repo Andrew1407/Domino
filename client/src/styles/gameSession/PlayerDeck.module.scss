@@ -9,26 +9,17 @@
 
 .stockBtn {
   @include block-decoration(rgb(221, 153, 90), all, $brown-theme, 2px);
-  font-size: 110%;
-  padding: 1%;
+  font-size: 130%;
   outline: none;
   width: max-content;
 }
 
 .tilesContainer {
   @include flex-display(row, none);
+  @include scrollbar(horizontal, 6px, $brown-theme, 10px);
   width: 100%;
   padding: 0 2%;
   overflow-x: scroll;
-
-  &::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: $brown-theme;
-    border-radius: 10px;
-  }
 }
 
 .tileContainer {

@@ -1,4 +1,4 @@
-export default function config() {
+export default function config(): object {
   return {
     port: parseInt(process.env.PORT, 10) || 8080,
     host: process.env.HOST || 'localhost',

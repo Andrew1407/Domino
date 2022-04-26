@@ -2,20 +2,11 @@
 
 .logContainer {
   @include block-decoration(rgb(248, 172, 85), left, $brown-theme, 4px);
+  @include scrollbar(vertical, 9px, $brown-theme, 10px);
   grid-column: 5 / -1;
   grid-row: 2 / -1;
   overflow-y: scroll;
   padding: 0.5% 2%;
-
-  &::-webkit-scrollbar {
-    width: 9px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: $brown-theme;
-    height: 5px;
-    border-radius: 10px;
-  }
 }
 
 .logHeader {

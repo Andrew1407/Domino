@@ -1,10 +1,10 @@
 import { makeReducer } from '../tools/state';
-import { LOG_ADD } from '../types';
+import { FIRST_TILE_SET } from '../types';
 
-const initial = [];
+const initial = null;
 
 const actions = {
-  [LOG_ADD]: (state, payload) => [ ...state, payload ],
+  [FIRST_TILE_SET]: (_, payload) => payload,
 };
 
 export default makeReducer({ initial, actions });

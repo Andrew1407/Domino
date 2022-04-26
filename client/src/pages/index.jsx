@@ -1,5 +1,6 @@
 import MainWrapper from '../components/main/MainWrapper';
 import CommandsList from '../components/commands/CommandsList';
+import { loadCommandsList } from '../api/http/commands';
 
 export default function HelloPage({ commands }) {
   return (
@@ -10,8 +11,11 @@ export default function HelloPage({ commands }) {
 };
 
 export async function getServerSideProps() {
-  const response = await fetch(`http://${process.env.SERVER_ADDR}/`);
   const params = { props: null };
-  if (response.ok) params.props = { commands: await response.text() };
-  return params;
+  try {
+    const commands = await loadCommandsList();
+    params.props = { commands };
+  } finally {
+    return params;
+  }
 };

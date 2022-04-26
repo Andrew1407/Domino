@@ -24,7 +24,7 @@ import { setPlayerDeck } from '../../storage/actions/playerDeck';
 import { setCommonDeck } from '../../storage/actions/commonDeck';
 import { addJoinedPlayer, removeJoinedPlayer, setJoinedPlayers } from '../../storage/actions/joinedPlayers';
 import { addToLog } from '../../storage/actions/log';
-import { socketConnection } from '../../api/socketConnection';
+import { socketConnection } from '../../api/ws/socketConnection';
 
 export default function GameSessionPage() {
   const router = useRouter();

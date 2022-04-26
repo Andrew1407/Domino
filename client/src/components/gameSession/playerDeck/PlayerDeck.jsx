@@ -1,15 +1,9 @@
 import { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getPickedTile, getPlayerDeck, getRoundInfo } from '../../../storage/selectors';
-import { deckContainer, stockBtn, tilesContainer, tileContainer, pickedTileContainer } from '../../../styles/gameSession/PlayerDeck.module.scss';
-import { getTileImage } from '../../../tools';
+import { getTileImagePath, tilesEqual } from '../../../tools';
 import { setPickedTile } from '../../../storage/actions/pickedTile'
-
-const tilesEqual = (first, second) => {
-  if (!(first && second)) return false;
-  return first.left === second.left &&
-    first.right === second.right;
-};
+import { deckContainer, stockBtn, tilesContainer, tileContainer, pickedTileContainer } from '../../../styles/gameSession/PlayerDeck.module.scss';
 
 export default function PlayerDeck() {
   const dispatch = useDispatch();
@@ -24,11 +18,9 @@ export default function PlayerDeck() {
 
   return (
     <div className={deckContainer}>
-      <input
-        type="button"
-        className={stockBtn}
-        value={`Get from stock (${stock})`}
-      />
+      <button className={stockBtn}>
+        Get from stock <b>({stock})</b>
+      </button>
 
       <div className={tilesContainer}>
         {deck.map(t => (
@@ -36,7 +28,7 @@ export default function PlayerDeck() {
             className={tilesEqual(pickedTile, t) ? pickedTileContainer : tileContainer }
             onClick={() => pickTile(t)}
             key={JSON.stringify(t)}
-            src={getTileImage(t)}
+            src={getTileImagePath(t)}
           />
         ))}
       </div>

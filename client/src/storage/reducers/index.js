@@ -9,6 +9,7 @@ import currentPlayer from './currentPlayer';
 import sessionEmitter from './sessionEmitter';
 import sessionId from './sessionId';
 import waitForPlayers from './waitForPlayers';
+import firstTile from './firstTile';
 
 const combined = {
   joinedPlayers,
@@ -21,6 +22,7 @@ const combined = {
   sessionEmitter,
   sessionId,
   waitForPlayers,
+  firstTile,
 };
 
 const rootReducer = combineReducers(combined);
