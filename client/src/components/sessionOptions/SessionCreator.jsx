@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import ErrorMessageModal from '../modals/ErrorMessageModal';
 import { createOptionEntries, playersSelector, scoreContainer, optionsSubmitBtn } from '../../styles/SessionOptions.module.scss';
-import { createSession } from '../../api/http/sessionsIdentifier';
+import { createSession } from '../../api/http/session';
+import { setSessionId } from '../../storage/actions/sessionId';
 
 const initialScore = 26;
 const availablePlayers = [2, 3, 4];

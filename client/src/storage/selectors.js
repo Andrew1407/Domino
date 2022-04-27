@@ -9,3 +9,4 @@ export const getSessionEmitter = s => s.sessionEmitter;
 export const getSessionId = s => s.sessionId;
 export const getWaitForPlayers = s => s.waitForPlayers;
 export const getFirstTile = s => s.firstTile;
+export const getMovePermission = s => s.movePermission;

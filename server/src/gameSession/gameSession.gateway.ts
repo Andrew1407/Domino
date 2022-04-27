@@ -120,7 +120,8 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
     const tile: DominoTile = this.parseTileData(tileData);
     const permission: boolean = await this.sessionHandler
       .ableToMove(session, player, tile, moveSide);
-    return this.responseWrapper({ permission }, 'moveCheck');
+    const resData: MovePermissionRes = { permission, tile, side: moveSide };
+    return this.responseWrapper(resData, 'moveCheck');
   }
 
   @SubscribeMessage('moveAction')
@@ -241,7 +242,7 @@ export default class GameSessionGateway implements BeforeApplicationShutdown, On
       this.endRound(session, true);
   }
 
-  private notifyPlayers<T extends { name: PlayerName }>(
+  private notifyPlayers<T extends NameContainerRes>(
     session: string,
     dataArr: T[],
     event: string

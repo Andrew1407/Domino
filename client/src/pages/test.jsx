@@ -6,7 +6,7 @@ import { setJoinedPlayers } from '../storage/actions/joinedPlayers';
 import { setPlayerDeck } from '../storage/actions/playerDeck';
 import { addToLog } from '../storage/actions/log';
 import { setCommonDeck } from '../storage/actions/commonDeck';
-import { setFirtsTile } from '../storage/actions/firstTile';
+import { setFirstTile } from '../storage/actions/firstTile';
 
 export default function TestPage() {
   const dispatch = useDispatch();
@@ -69,7 +69,7 @@ export default function TestPage() {
       // { left: 1, right: 1 },
     ]));
 
-    dispatch(setFirtsTile({ left: 0, right: 0 }))
+    dispatch(setFirstTile({ left: 0, right: 0 }))
 
     // dispatch(setCommonDeck([
     //   { left: 1, right: 1 },
@@ -84,26 +84,24 @@ export default function TestPage() {
     // ]));
 
     dispatch(setCommonDeck([
-
-     
       
-      { left: 2, right: 1 },
-      { left: 5, right: 0 },
-      { left: 0, right: 6 },
-      { left: 1, right: 3 },
-
-      { left: 4, right: 4 },
-
-      { left: 6, right: 5 },
-      { left: 6, right: 1 },
+      // { left: 0, right: 6 },
+      // { left: 5, right: 0 },
+      // { left: 2, right: 1 },
       
-      { left: 6, right: 6 },
-      { left: 3, right: 2 },
-      { left: 1, right: 4 },
-      { left: 5, right: 4 },
+      // { left: 1, right: 3 },
+
+      // { left: 4, right: 4 },
+      // { left: 6, right: 5 },
       { left: 0, right: 0 },
 
+      // { left: 6, right: 1 },
       
+      // { left: 6, right: 6 },
+      // { left: 3, right: 2 },
+      // { left: 1, right: 4 },
+      // { left: 5, right: 4 },
+
     ]));
     
   }, []);

@@ -1,6 +1,7 @@
 import { WsResponse } from '@nestjs/websockets';
 import DominoTile, { TilesDeck } from '../entities/DominoTile';
 import { PlayerName } from '../entities/Player';
+import { MoveOption } from '../playMode/PlayMode';
 import { PlayersScore } from '../playMode/ScoreKeeper';
 import { SessionData } from '../storage/StorageClient';
 
@@ -36,7 +37,9 @@ export interface NameContainerRes {
 }
 
 export interface MovePermissionRes {
-  permission: boolean
+  permission: boolean,
+  side: MoveOption,
+  tile: DominoTile
 }
 
 export interface NextMoveRes extends NameContainerRes {

@@ -9,7 +9,7 @@ export default function DominoBoard() {
   
   return (
     <div className={boardContainer}>
-      {!waitForPlayers ?
+      {waitForPlayers ?
         <ConnectionLoading /> :
         <TilesTable />
       }

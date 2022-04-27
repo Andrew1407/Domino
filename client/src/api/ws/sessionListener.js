@@ -16,8 +16,8 @@ export default class SessionListener {
   }
 
   moveCheck(data) {
-    const { permission } = data;
-    
+    const { permission, side } = data;
+    this.#gameState?.setMovePermission({ permission, side });
   }
 
   joinSession(data) {
@@ -79,6 +79,7 @@ export default class SessionListener {
   firstMove(data) {
     if (data.deck) this.#gameState?.setPlayerDeck(data.deck);
     this.#gameState?.setCommonDeck(data.commonDeck);
+    this.#gameState?.setFirstTile(data.commonDeck[0]);
     const logMessage = `Player "${data.current_move}" made a first move with a tile ${JSON.stringify(data.tile)}.`;
     this.#setMainStateValues(data, logMessage);
   }

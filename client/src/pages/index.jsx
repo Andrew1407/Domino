@@ -11,10 +11,10 @@ export default function HelloPage({ commands }) {
 };
 
 export async function getServerSideProps() {
-  const params = { props: null };
+  const params = { props: {} };
   try {
     const commands = await loadCommandsList();
-    params.props = { commands };
+    params.props.commands = commands;
   } finally {
     return params;
   }
