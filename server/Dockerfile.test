@@ -1,0 +1,12 @@
+FROM node:16
+
+WORKDIR /app/server
+
+COPY . .
+
+RUN cp .env.example .env && \
+  npm install -g @nestjs/cli && \
+  npm i && \
+  npm run build
+
+CMD [ "npm", "test" ]

@@ -3,7 +3,7 @@ import { playerBlock, infoEntries, nameInfo, separator, setPlayer, scoreImg, til
 
 export default function PlayerInfo({ name, score, tiles, you }) {
   return (
-    <div className={playerBlock}>
+    <div className={playerBlock} data-testid="player-info">
       <span className={applyStylesIf(you, [nameInfo, setPlayer], [nameInfo])}>
         {name}
         {you && <small> (you) </small>}

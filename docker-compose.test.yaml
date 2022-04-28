@@ -1,0 +1,16 @@
+version: "3"
+services:
+  server_test:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.test
+    depends_on:
+      - "redis"
+
+      
+  redis:
+    container_name: redis
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASSWD}
+    ports:
+      - "6379:6379"

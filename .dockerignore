@@ -1,0 +1,12 @@
+# ignore .git and .cache folders
+.git
+.github
+.cache
+
+# project dependencies
+**/node_modules/
+**/package_lock.json
+
+# built artefact
+server/dist/
+.next/

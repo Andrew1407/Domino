@@ -1,0 +1,21 @@
+version: "3"
+services:
+  server:
+    build: ./server
+    depends_on:
+      - "redis"
+    ports:
+      - "${SERVER_HTTP_PORT}:${SERVER_HTTP_PORT}"
+      - "${SERVER_WS_PORT}:${SERVER_WS_PORT}"
+
+  client:
+    build: ./client
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
+      
+  redis:
+    container_name: redis
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASSWD}
+    ports:
+      - "6379:6379"
