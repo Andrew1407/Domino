@@ -27,7 +27,6 @@ export default function TilesTable() {
   const deck = useSelector(getCommonDeck);
   const firstTile = useSelector(getFirstTile);
   const pickedTile = useSelector(getPickedTile);
-  console.log(deck);
   const movePermission = useSelector(getMovePermission);
   const sessionEmitter = useSelector(getSessionEmitter);
   

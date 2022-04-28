@@ -84,7 +84,7 @@ const cornerPosition = ({ tileSize, tile, position, direction, previous }) => {
       position.y += tileSize.height * 0.25 * coefY;
     }
   }
-
+  
   if (tile.left < tile.right) rotation -= 180;
   const nextPosition = { ...position, rotation };
 

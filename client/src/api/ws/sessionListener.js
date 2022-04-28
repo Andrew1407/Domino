@@ -47,6 +47,7 @@ export default class SessionListener {
   moveAction(data) {
     if (data.deck) this.#gameState?.setPlayerDeck(data.deck);
     this.#gameState?.setCommonDeck(data.commonDeck);
+    this.#gameState?.clearPickedTile();
     const logMessage = `Player "${data.current_move}" made a move with a tile ${JSON.stringify(data.tile)}.`;
     this.#setMainStateValues(data, logMessage);
   }

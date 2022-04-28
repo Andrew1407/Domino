@@ -2,19 +2,14 @@ import { useRouter } from 'next/router';
 import { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  getCurentPlayer,
   getJoinedPlayers,
-  getLog,
-  getCommonDeck,
-  getPickedTile,
-  getPlayerDeck,
   getRoundInfo,
   getSessionId,
   getSessionEmitter,
 } from '../../storage/selectors';
 import { setCurrentPlayer } from '../../storage/actions/currentPlayer';
 import { setCurrentMove, setRoundInfo } from '../../storage/actions/roundInfo';
-import { setPickedTile, clearPickedTile } from '../../storage/actions/pickedTile';
+import { clearPickedTile } from '../../storage/actions/pickedTile';
 import { setPlayerDeck } from '../../storage/actions/playerDeck';
 import { setCommonDeck } from '../../storage/actions/commonDeck';
 import { setMovePermission } from '../../storage/actions/movePermission';
@@ -40,6 +35,7 @@ const makeStateHandlers = dispatch => ({
   setCurrentMove: (...args) => dispatch(setCurrentMove(...args)),
   setMovePermission: (...args) => dispatch(setMovePermission(...args)),
   setFirstTile: (...args) => dispatch(setFirstTile(...args)),
+  clearPickedTile: (...args) => dispatch(clearPickedTile(...args)),
 });
 
 export default function GameSessionPage() {
